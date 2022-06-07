@@ -1,2 +1,2 @@
 # RHEL8-Hardening-Script
-RHEL8 Hardening Script developed by interns 
+RHEL8 Hardening Script developed by PLDT Global Interns 
