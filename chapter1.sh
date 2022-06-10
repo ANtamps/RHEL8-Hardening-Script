@@ -71,10 +71,16 @@ sysctl -w kernel.randomize_va_space=2
 
 # Install SELinux
 
-dnf install libselinux
+if rpm -qa | grep -q "libselinux"; then
+	echo "Libselinux installed, continuing..."
+else
+	echo "Installing libselinux..."
+	dnf install libselinux
+fi
 
 # Ensure SELinux is not disabled in bootloader configuration
 
+echo "Updating SELinux to ensure its not disabled in bootloader config..."
 grubby --update-kernel ALL --remove-args 'selinux=0 enforcing=0'
 
 # Check if SELINUXTYPE=targeted, if not set it to targeted
@@ -87,6 +93,7 @@ fi
 
 # Set SELinux mode to Enforcing
 
+echo "Setting enforce mode to 1"
 setenforce 1
 
 # Edit SELinux parameter to Enforcing
