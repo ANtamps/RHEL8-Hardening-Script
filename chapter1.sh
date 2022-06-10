@@ -113,7 +113,7 @@ fi
 
 if rpm -qa | grep setroubleshoot; then
 	echo "Setroubleshoot package found, removing..."
-	dnf remove setroubleshoot
+	dnf remove "setroubleshoot*"
 else
 	echo "Setroubleshoot package not found, continuing..."
 fi
@@ -121,8 +121,8 @@ fi
 # Remove mcstrans if installed
 
 if rpm -qa | grep mcstrans; then
-	echo "Mcstrans packagr found, removing..."
-	dnf remove mcstrans
+	echo "Mcstrans package found, removing..."
+	dnf remove "mcstrans*"
 else
 	echo "Mcstrans package not found, continuing..."
 fi
@@ -154,31 +154,75 @@ chown root:root /etc/issue.net
 chmod u-x,go-wx /etc/issue.net
 
 ##For 1.8##
+
+#To check if there's a GUI in Linux
+if ls /usr/bin/*session | grep -q "/usr/bin/gnome-session" ; then
+
 ##1.8.2 Ensure GDM login banner is configured (Automated)##
-user-db:user
-system-db:gdm
-file-db:/usr/share/gdm/greeter-dconf-defaults
-[org/gnome/login-screen]
-banner-message-enable=true
-banner-message-text='<banner message>'
+if test -f /etc/dconf/profile/gdm; then
+
+	if grep -q "user-db:user" /etc/dconf/profile/gdm &&
+	grep -q "system-db:gdm" /etc/dconf/profile/gdm &&
+	grep -q "file-db:/usr/share/gdm/greeter-dconf-defaults" /etc/dconf/profile/gdm; then 
+
+	echo "GDM Profile is set.. Continuing..."
+
+	else
+	echo -e "user-db:user\nsystem-db:gdm\nfile-db:/usr/share/gdm/greeter-dconf-defaults" > /etc/dconf/profile/gdm
+	fi
+else 
+
+touch /etc/dconf/profile/gdm
+echo -e "user-db:user\nsystem-db:gdm\nfile-db:/usr/share/gdm/greeter-dconf-defaults" > /etc/dconf/profile/gdm
+
+fi
+
+if test -f /etc/dconf/db/gdm.d/01-banner-message; then
+
+	if grep -q "[org/gnome/login-screen]" /etc/dconf/db/gdm.d/01-banner-message &&
+	grep -q "banner-message-enable=true" /etc/dconf/db/gdm.d/01-banner-message &&
+	grep -q "banner-message-text='<banner message>" /etc/dconf/db/gdm.d/01-banner-message; then
+
+	echo "Banner message is set.. Continuing..."
+
+	else
+	echo -e "[org/gnome/login-screen]\nbanner-message-enable=true\nbanner-message-text='<banner message>'" > /etc/dconf/db/gdm.d/01-banner-message
+	fi
+else 
+
+touch /etc/dconf/db/gdm.d/01-banner-message
+echo -e "[org/gnome/login-screen]/nbanner-message-enable=true/nbanner-message-text='<banner message>'" > /etc/dconf/db/gdm.d/01-banner-message
+
 dconf update
+
+fi 
+
 ##1.8.3 Ensure last logged in user display is disabled (Automated)##
-user-db:user
-system-db:gdm
-file-db:/usr/share/gdm/greeter-dconf-defaults
-[org/gnome/login-screen]
-# Do not show the user list
-disable-user-list=true
+if test -f /etc/dconf/db/gdm.d/00-login-screen; then
+
+	if grep -q "[org/gnome/login-screen]" /etc/dconf/db/gdm.d/00-login-screen &&
+	grep -q "disable-user-list=true" /etc/dconf/db/gdm.d/00-login-screen; then
+
+	echo "Last logged display is set.. Continuing..."
+
+	else
+	echo -e "[org/gnome/login-screen]\ndisable-user-list=true" > /etc/dconf/db/gdm.d/00-login-screen
+	fi
+else
+
+touch /etc/dconf/db/gdm.d/00-login-screen
+echo -e "[org/gnome/login-screen]\ndisable-user-list=true" > /etc/dconf/db/gdm.d/00-login-screen
+
 dconf update
-##1.8.4 Ensure XDMCP is not enabled (Automated)##
-sed '/Enable=true/d'/etc/gdm/custom.conf
-##1.8.5 Ensure automatic mounting of removable media is disabled (Automated)##
-cat << EOF >> /etc/dconf/db/local.d/00-media-automount
-[org/gnome/desktop/media-handling]
-automount=false
-automount-open=false
-EOF
-dconf update
+
+fi
+
+else
+
+echo "The server has no GUI... Continuing"
+
+fi
+
 ##1.10 Ensure system-wide crypto policy is not legacy (Automated)#
 update-crypto-policies --set DEFAULT
 update-crypto-policies
