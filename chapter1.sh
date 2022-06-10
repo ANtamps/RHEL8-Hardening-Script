@@ -118,7 +118,12 @@ fi
 ##1.7 Command Line Warning Banners##
 
 ##1.7.1 Ensure message of the day is configured properly##
-rm /etc/motd
+if test -f /etc/motd/; then
+        echo "MOTD exists on your filesystem, removing..."
+
+else
+    	echo "MOTD not found, continuing..."
+fi
 
 ##1.7.2 Ensure local login warning banner is configured properly##
 echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue
