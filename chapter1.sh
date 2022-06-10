@@ -120,7 +120,7 @@ fi
 ##1.7.1 Ensure message of the day is configured properly##
 if test -f /etc/motd/; then
         echo "MOTD exists on your filesystem, removing..."
-
+	rm /etc/motd
 else
     	echo "MOTD not found, continuing..."
 fi
