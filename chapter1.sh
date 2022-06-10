@@ -7,7 +7,12 @@ sed -i 's/^gpgcheck\s*=\s*.*/gpgcheck=1/' /etc/dnf/dnf.conf
 ##1.3Filesystem Integrity Checking##
 
 ##1.3.1 Ensure AIDE is installed##
-dnf install aide
+if  rpm -qa | grep -q "aide"; then
+	echo "AIDE already installed"
+else
+	echo "AIDE not installed, installing.."
+	dnf install aide
+fi
 
 ##To initialize AIDE##
 echo "Initializing AIDE..."
