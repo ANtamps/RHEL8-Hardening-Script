@@ -23,8 +23,8 @@ mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 
 ##1.3.2 Ensure filesystem integrity is regularly checked##
 crontab -u root -l > mycron
-echo "0 5 * * * /usr/sbin/aide --check" > mycron
-crontab -u root > mycron
+echo "0 5 * * * /usr/sbin/aide --check" >> mycron
+crontab -u root mycron
 rm mycron
 
 ##The checking in this recommendation occurs every day at 5am.##
