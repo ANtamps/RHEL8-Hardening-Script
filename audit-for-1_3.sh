@@ -9,7 +9,7 @@ if  rpm -q aide &> /dev/null; then
 	echo -e "AIDE is already installed: \033[1;32mOK\033[0m"
 
 else
-	echo -e "AIDE needs to be installed: \033[1;32mOK\033[0m"
+	echo -e "AIDE needs to be installed: \033[1;31mERROR\033[0m"
 fi
 
 
