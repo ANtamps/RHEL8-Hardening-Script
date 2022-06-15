@@ -14,8 +14,7 @@ fi
 if test -f /etc/chrony.conf; then
 
 	if grep -q "server <remote-server>" /etc/chrony.conf; then
-
-	echo "Remote server is already configured... Continuing..."
+	echo "server <remote-server>"
 
 	else
 	echo "server <remote-server>" > /etc/chrony.conf
