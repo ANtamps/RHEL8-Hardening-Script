@@ -107,3 +107,20 @@ else
     nft add rule inet filter input iif lo accept
 fi
 
+##3.4.2.8 Ensure nftables outbound and established connections are configured (Manual)
+
+##3.4.2.9 Ensure nftables default deny firewall policy (Automated)
+nft chain inet filter input { policy drop \; }
+nft chain inet filter forward { policy drop \; }
+nft chain inet filter output { policy drop \; }
+
+##3.4.2.10 Ensure nftables service is enabled
+if  systemctl is-enabled nftables &> /dev/null; then
+    systemctl enable nftables
+    echo "nftables services enabled, continuing..."
+else   
+     echo "nftables services not enabled, configuring..."
+     sudo yum -y install nftables
+     systemctl enable nftables
+fi
+
