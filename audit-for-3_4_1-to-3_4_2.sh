@@ -109,3 +109,37 @@ else
 
 fi
 
+
+
+##3.4.2.8 Ensure nftables outbound and established connections are configured (Manual)
+
+##3.4.2.9 Ensure nftables default deny firewall policy (Automated)
+
+if     nft list ruleset | grep 'hook input' &> /dev/null; then
+     echo -e "type filter hook input priority 0; policy drop configured: \033[1;32mOK\033[0m"
+else   
+     echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$
+
+fi
+
+if     nft list ruleset | grep 'hook forward' &> /dev/null; then
+     echo -e "type filter hook forward priority 0; policy drop configured: \033[1;32mOK\033[0m"
+else   
+     echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$
+
+fi
+
+if     nft list ruleset | grep 'hook output' &> /dev/null; then
+     echo -e "type filter hook output priority 0; policy drop configured: \033[1;32mOK\033[0m"
+else   
+     echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$
+
+fi
+
+##3.4.2.10 Ensure nftables service is enabled## 
+if     systemctl is-enabled nftables &> /dev/null; then
+     echo -e "nftables services enabled: \033[1;32mOK\033[0m"
+else   
+     echo -e "nftables services not enabled: \033[1;31mERROR\033[0m"
+
+fi
