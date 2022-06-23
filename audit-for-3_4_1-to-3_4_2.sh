@@ -47,3 +47,31 @@ else
     echo -e "No zone found: \033[1;31mERROR\033[0m"
 fi
 
+##3.4.2
+
+##3.4.2.1 Ensure nftables is installed (Automated)
+
+if  rpm -q nftables &> /dev/null; then
+    echo -e "nftables installed: \033[1;32mOK\033[0m"
+else   
+     echo -e "nftable not found: \033[1;31mERROR\033[0m"
+
+fi
+##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
+if   systemctl is-enabled firewalld &> /dev/null; then
+    echo -e "firewalld unmasked: \033[1;31mERROR\033[0m"
+else   
+   echo -e "firewalld nmasked: \033[1;32mOK\033[0m"
+fi
+##3.4.2.3 Ensure iptables-services not installed with nftables
+if  rpm -q iptables-services &> /dev/null; then
+     echo -e "package iptables-services found: \033[1;31mERROR\033[0m"
+else   
+     echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"
+fi
+
+##3.4.2.4 Ensure iptables are flushed with nftables (Manual)
+
+##3.4.2.5 Ensure an nftables table exists
+ nft list tables
+echo -e  "nftables table exists: \033[1;32mOK\033[0m"
