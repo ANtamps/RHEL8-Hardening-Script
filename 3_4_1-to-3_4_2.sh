@@ -92,3 +92,18 @@ fi
 ##3.4.2.5 Ensure an nftables table exists
  nft create table inet filter
 
+##3.4.2.6 Ensure nftables base chains exist
+nft create chain inet filter input { type filter hook input priority 0 \; }
+nft create chain inet filter forward { type filter hook forward priority 0 \; }
+nft create chain inet filter output { type filter hook output priority 0 \; }
+
+##3.4.2.7 Ensure nftables loopback traffic is configured
+if  nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /dev/null; then
+   nft add rule inet filter input iif lo accept
+   echo "Loopback interface already configured, continuing.."
+    
+else
+    echo "Loopback interface is not set, configuring.."
+    nft add rule inet filter input iif lo accept
+fi
+
