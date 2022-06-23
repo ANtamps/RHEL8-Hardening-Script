@@ -53,3 +53,42 @@ fi
 
 ##3.4.1.6 Ensure network interfaces are assigned to appropriate zone (Manual)
 ##3.4.1.7 Ensure firewalld drops unnecessary services and ports (Manual)
+
+
+##3.4.2
+
+##3.4.2.1 Ensure nftables is installed (Automated)
+
+if  rpm -q nftables &> /dev/null; then
+    echo "nftables installed, continuing..."
+else   
+    echo "nftables not found, installing..."
+     dnf -y install nftables &> /dev/null
+fi
+
+##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
+
+if rpm -q iptables-services &> /dev/null; then
+   echo "Firewalld found.. masking.."
+   systemctl --now mask firewalld
+
+else   
+    echo "Firewalld is masked, continuing..."
+	systemctl --now mask firewalld
+fi
+
+##3.4.2.3 Ensure iptables-services not installed with nftables
+
+if  rpm -q iptables-services &> /dev/null; then
+    echo "iptables-services installed, removing..."
+    dnf -y remove iptables-services &> /dev/null
+else
+    echo "iptables-services not installed, continuing..."
+    dnf -y remove iptables-services
+fi
+
+##3.4.2.4 Ensure iptables are flushed with nftables (Manual)
+
+##3.4.2.5 Ensure an nftables table exists
+ nft create table inet filter
+
