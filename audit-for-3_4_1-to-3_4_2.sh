@@ -75,3 +75,37 @@ fi
 ##3.4.2.5 Ensure an nftables table exists
  nft list tables
 echo -e  "nftables table exists: \033[1;32mOK\033[0m"
+
+##3.4.2.6 Ensure nftables base chains exist
+
+if   nft list ruleset | grep 'hook input' &> /dev/null; then
+     echo -e "type filter hook input priority 0: \033[1;32mOK\033[0m"
+else   
+     echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m"
+
+fi
+
+if    nft list ruleset | grep 'hook forward' &> /dev/null; then
+     echo -e "type filter hook forward priority 0: \033[1;32mOK\033[0m"
+else   
+     echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m"
+
+fi
+
+if     nft list ruleset | grep 'hook output' &> /dev/null; then
+     echo -e "type filter hook output priority 0: \033[1;32mOK\033[0m"
+else   
+     echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m"
+
+fi
+
+
+##3.4.2.7 Ensure nftables loopback traffic is configured
+
+if     nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /dev/null; then
+     echo -e "loopback interface configured: \033[1;32mOK\033[0m"
+else   
+     echo -e "loopback interface configured: \033[1;31mERROR\033[0m"
+
+fi
+
