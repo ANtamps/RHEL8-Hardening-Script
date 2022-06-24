@@ -395,7 +395,7 @@ fi
 
 if rpm -q firewalld &> /dev/null; then
     echo "firewalld installed: \033[1;32mOK\033[0m"
-    dnf remove firewalld &> /dev/null
+    
 else
     echo "firewalld not installed: \033[1;31mERROR\033[0m"
 fi
