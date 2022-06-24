@@ -85,6 +85,9 @@ if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redire
         echo "Kernel parameter not set for packet redirecting, fixing..."
         sysctl -w net.ipv4.conf.all.send_redirects=0 &> /dev/null
     fi
+else
+    echo "Packet redirecting might not be set to 0, adding in parameter to conf file..."
+    echo "net.ipv4.conf.all.send.redirects = 0" >> /etc/sysctl.d/60-netipv4_syctl.conf 
 fi
 
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
@@ -96,6 +99,9 @@ if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_re
         echo "Kernel parameter not set for packet redirecting, fixing..."
         sysctl -w net.ipv4.conf.default.send_redirects=0 &> /dev/null
     fi
+else
+    echo "Default redirect might not be set to 0, adding in parameter to conf file..."
+    echo "net.ipv4.conf.default.send.redirects = 0" >> /etc/sysctl.d/60-netipv4_syctl.conf 
 fi
 
 
