@@ -30,4 +30,29 @@ else
   echo -e "limit value is not sufficient: \033[1;31mERROR\033[0m"
 fi
 
+##4.1.2.1 Ensure audit log storage size is configured 
+if grep -w "^\s*max_log_file\s*=" /etc/audit/auditd.conf &> /dev/null; then
+   echo -e "audit storage size configured: \033[1;32mOK\033[0m"
+else   
+  echo -e "audit storage size not configured: \033[1;31mERROR\033[0m"
+fi
 
+##4.1.2.2 Ensure audit logs are not automatically deleted
+if grep max_log_file_action /etc/audit/auditd.conf &> /dev/null; then
+   echo -e "logs not automatically deleted: \033[1;32mOK\033[0m"
+else   
+  echo -e "logs automatically deleted: \033[1;31mERROR\033[0m"
+fi
+
+##4.1.2.3 Ensure system is disabled when audit logs are full 
+if grep space_left_action /etc/audit/auditd.conf &> /dev/null; then
+   echo -e "space_left_action = email: \033[1;32mOK\033[0m"
+else   
+  echo -e "space_left_action = unknown: \033[1;31mERROR\033[0m"
+fi
+
+if grep action_mail_acct /etc/audit/auditd.conf &> /dev/null; then
+   echo -e "action_mail_acct = root: \033[1;32mOK\033[0m"
+else   
+  echo -e "action_mail_acct = unknown: \033[1;31mERROR\033[0m"
+fi
