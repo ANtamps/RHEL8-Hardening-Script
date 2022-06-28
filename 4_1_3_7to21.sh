@@ -6,7 +6,7 @@ UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
 echo "Making access audit log rules..."
 touch /etc/audit/rules.d/50-access.rules
 
-[ -n "${UID_MIN}"] && printf "
+[ -n "${UID_MIN}" ] && printf "
 -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>=${UID_MIN} -F auid!=unset -k access
 -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>=${UID_MIN} -F auid!=unset -k access
 -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>=${UID_MIN} -F auid!=unset -k access
@@ -27,7 +27,7 @@ printf "
 echo "Making permission modification audit log rules..."
 touch /etc/audit/rules.d/50-perm_mod.rules
 
-[ -n "${UID_MIN}"] && printf "
+[ -n "${UID_MIN}" ] && printf "
 -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
 -a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
 -a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
@@ -37,7 +37,7 @@ touch /etc/audit/rules.d/50-perm_mod.rules
 " >> /etc/audit/rules.d/50-perm_mod.rules \ || printf "ERROR: Variable 'UID_MIN' is unset. \n"
 
 echo "Adding in file system mounts audit log rules to permissison modification rules..."
-[ -n "${UID_MIN}"] && printf "
+[ -n "${UID_MIN}" ] && printf "
 -a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -k mounts
 -a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -k mounts
 " >> /etc/audit/rules.d/50-perm_mod.rules \ || printf "ERROR: Variable 'UID_MIN' is unset. \n"
