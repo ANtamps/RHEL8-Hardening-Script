@@ -112,4 +112,9 @@ touch /etc/audit/rules.d/50-kernel_modules.rules
 echo "Setting audit configuration to immutable..."
 echo "-e 2" > /etc/audit/rules.d/99-finalize.rules
 
+echo "Loading audit rules..."
+augenrules --load &>
 
+if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then 
+    printf "Reboot required to load rules\n"; 
+fi
