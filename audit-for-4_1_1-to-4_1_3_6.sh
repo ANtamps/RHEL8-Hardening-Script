@@ -56,3 +56,30 @@ if grep action_mail_acct /etc/audit/auditd.conf &> /dev/null; then
 else   
   echo -e "action_mail_acct = unknown: \033[1;31mERROR\033[0m"
 fi
+
+##4.1.3.1 Ensure changes to system administration scope (sudoers) is collected
+if awk '/^ *-w/ \ &> /dev/null; then
+   echo -e "System administrator scope is set: \033[1;32mOK\033[0m"
+else   
+  echo -e "System administrator scope is not set: \033[1;31mERROR\033[0m"
+fi
+
+if auditctl -l | awk '/^ *-w/ \ &> /dev/null; then
+   echo -e "Rules loaded: \033[1;32mOK\033[0m"
+else   
+  echo -e "Rules not loaded: \033[1;31mERROR\033[0m"
+fi
+
+##4.1.3.2 Ensure actions as another user are always logged
+if awk '/^ *-a *always,exit/ \ &> /dev/null; then
+   echo -e "User emulation rules set: \033[1;32mOK\033[0m"
+else   
+  echo -e "User emulation rules is not set: \033[1;31mERROR\033[0m"
+fi
+
+if auditctl -l | awk '/^ *-a *always,exit/ \ &> /dev/null; then
+   echo -e "Rules loaded: \033[1;32mOK\033[0m"
+else   
+  echo -e "Rules not loaded: \033[1;31mERROR\033[0m"
+fi
+
