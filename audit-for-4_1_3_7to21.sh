@@ -1,259 +1,192 @@
-UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+#!/bin/bash
+
+COUNTER=0
 
 # 4.1.3.7
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \
-&&/ -F *arch=b[2346]{2}/ \
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
-&&/ -F *auid>=${UID_MIN}/ \
-&&(/ -F *exit=-EACCES/||/ -F *exit=-EPERM/) \
-&&/ -S/ \
-&&/creat/ \
-&&/open/ \
-&&/truncate/ \
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c access /etc/audit/rules.d/50-access.rules) -eq 4 ]; then
+    echo "Access rules for file systems set on disk config: "
+else
+    echo "Access rules for file systems not set on disk config"
+fi
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \
-&&/ -F *arch=b[2346]{2}/ \
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
-&&/ -F *auid>=${UID_MIN}/ \
-&&(/ -F *exit=-EACCES/||/ -F *exit=-EPERM/) \
-&&/ -S/ \
-&&/creat/ \
-&&/open/ \
-&&/truncate/ \
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c access) -eq 4 ]; then
+    echo "Access rules for file systems set on running config:"
+else
+    echo "Access rules for file systems not set on running config:"
+fi
 
 # 4.1.3.8 
 
-awk '/^ *-w/ \
-&&(/\/etc\/group/ \
-    ||/\/etc\/passwd/ \
-    ||/\/etc\/gshadow/ \ 
-    ||/\/etc\/shadow/ \ 
-    ||/\/etc\/security\/opasswd/) \
-&&/ +-p *wa/ \
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+if [ $(grep -c identity /etc/audit/rules.d/50-identity.rules) -eq 5 ]; then
+    echo "User/Group info modification events set on disk config: "
+else
+    echo "User/Group info modification events not set on disk config: "
+fi
 
-auditctl -l | awk '/^ *-w/ \
-&&(/\/etc\/group/ \
-    ||/\/etc\/passwd/ \
-    ||/\/etc\/gshadow/ \ 
-    ||/\/etc\/shadow/ \ 
-    ||/\/etc\/security\/opasswd/) \
-&&/ +-p *wa/ \
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+if [ $(auditctl -l | grep -c identity) -eq 5 ]; then
+    echo "User/Group info modification events set on running config: "
+else
+    echo "User/Group info modification events not set on running config: "
+fi
 
 # 4.1.3.9
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -S/ \ &&/ -F *auid>=${UID_MIN}/ \ 
-&&(/chmod/||/fchmod/||/fchmodat/ \ 
-    ||/chown/||/fchown/||/fchownat/||/lchown/ \ 
-    ||/setxattr/||/lsetxattr/||/fsetxattr/ \ 
-    ||/removexattr/||/lremovexattr/||/fremovexattr/) \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c perm_mod /etc/audit/rules.d/50-perm_mod.rules) -eq 6 ]; then
+    echo "Permission modification events set on disk config: "
+else
+    echo "Permission modification events not set on disk config: "
+fi
 
-
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -S/ \ &&/ -F *auid>=${UID_MIN}/ \ 
-&&(/chmod/||/fchmod/||/fchmodat/ \ 
-    ||/chown/||/fchown/||/fchownat/||/lchown/ \ 
-    ||/setxattr/||/lsetxattr/||/fsetxattr/ \ 
-    ||/removexattr/||/lremovexattr/||/fremovexattr/) \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c perm_mod) -eq 6 ]; then
+    echo "Permission modification events set on running config: "
+else
+    echo "Permission modification events not set on running config: "
+fi
 
 # 4.1.3.10
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ &&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -S/ \ 
-&&/mount/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c mounts /etc/audit/rules.d/50-perm_mod.rules) -eq 2 ]; then
+    echo "Successful file system mounts events set on disk config: "
+else
+    echo "Successful file system mounts events not set on disk config: "
+fi
 
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ &&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -S/ \ 
-&&/mount/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c mounts) -eq 2 ]; then
+    echo "Successful file system mounts events set on running config: "
+else
+    echo "Successful file system mounts events not set on running config: "
+fi
 
 # 4.1.3.11
 
-awk '/^ *-w/ \ 
-&&(/\/var\/run\/utmp/ \ 
-    ||/\/var\/log\/wtmp/ \ 
-    ||/\/var\/log\/btmp/) \ 
-&&/ +-p *wa/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+if [ $(grep -c session /etc/audit/rules.d/50-session.rules) -eq 3 ]; then
+    echo "Session initiation information set on disk config: "
+else
+    echo "Session initiation information not set on disk config: "
+fi
 
-auditctl -l | awk '/^ *-w/ \ 
-&&(/\/var\/run\/utmp/ \ 
-    ||/\/var\/log\/wtmp/ \ 
-    ||/\/var\/log\/btmp/) \ 
-&&/ +-p *wa/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+if [ $(auditctl -l | grep -c session) -eq 3 ]; then
+    echo "Session initiation information set on running config: "
+else
+    echo "Session initiation information not set on running config: "
+fi
 
 # 4.1.3.12
 
-awk '/^ *-w/ \ 
-&&(/\/var\/log\/lastlog/ \ 
-    ||/\/var\/run\/faillock/) \ 
-&&/ +-p *wa/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+if [ $(grep -c logins /etc/audit/rules.d/50-login.rules) -eq 2 ]; then
+    echo "Login and logout events set on disk config: "
+else
+    echo "Login and logout events not set on disk config: "
+fi
 
-auditctl -l | awk '/^ *-w/ \ 
-&&(/\/var\/log\/lastlog/ \ 
-    ||/\/var\/run\/faillock/) \ 
-&&/ +-p *wa/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+if [ $(auditctl -l | grep -c logins) -eq 2 ]; then
+    echo "Login and logout events set on running config: "
+else
+    echo "Login and logout events not set on running config: "
+fi
 
 # 4.1.3.13
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -S/ \ 
-&&(/unlink/||/rename/||/unlinkat/||/renameat/) \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c delete /etc/audit/rules.d/50-delete.rules) -eq 2 ]; then
+    echo "File deletion events set on disk config: "
+else
+    echo "File deletion events not set on disk config: "
+fi
 
-
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -S/ \ 
-&&(/unlink/||/rename/||/unlinkat/||/renameat/) \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c delete) -eq 2 ]; then
+    echo "File deletion events set on running config: "
+else
+    echo "File deletion events not set on running config: "
+fi
 
 # 4.1.3.14
 
-awk '/^ *-w/ \ 
-&&(/\/etc\/selinux/ \ 
-    ||/\/usr\/share\/selinux/) \ 
-&&/ +-p *wa/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+if [ $(grep -c MAC-policy /etc/audit/rules.d/50-MAC-policy.rules) -eq 2 ]; then
+    echo "MAC system modification events set on disk config: "
+else
+    echo "MAC system modification events not set on disk config: "
+fi
 
-auditctl -l | awk '/^ *-w/ \ 
-&&(/\/etc\/selinux/ \ 
-    ||/\/usr\/share\/selinux/) \ 
-&&/ +-p *wa/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+if [ $(auditctl -l | grep -c MAC-policy) -eq 2 ]; then
+    echo "MAC system modification events set on running config: "
+else
+    echo "MAC system modification events not set on running config: "
+fi
 
 # 4.1.3.15
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ &&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/chcon/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c path=/usr/bin/chcon /etc/audit/rules.d/50-perm_chng.rules) -eq 1 ]; then
+    echo "Unsuccessful chcon events set on disk config: "
+else
+    echo "Unsuccessful chcon events not set on disk config: "
+fi
 
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ &&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/chcon/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c path=/usr/bin/chcon) -eq 1 ]; then
+    echo "Unsuccessful chcon events set on running config: "
+else
+    echo "Unsuccessful chcon events not set on running config: "
+fi
 
 # 4.1.3.16
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/setfacl/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c path=/usr/bin/setfacl /etc/audit/rules.d/50-priv_cmd.rules) -eq 1 ]; then
+    echo "Unsuccessful setfacl events set on disk config: "
+else
+    echo "Unsuccessful setfacl events not set on disk config: "
+fi
 
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/setfacl/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c path=/usr/bin/setfacl) -eq 1 ]; then
+    echo "Unsuccessful setfacl events set on running config: "
+else
+    echo "Unsuccessful setfacl events not set on running config: "
+fi
 
 # 4.1.3.17
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/chacl/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c path=/usr/bin/chacl /etc/audit/rules.d/50-perm_chng.rules) -eq 1 ]; then
+    echo "Unsuccessful chacl events set on disk config: "
+else
+    echo "Unsuccessful chacl events not set on disk config: "
+fi
 
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/chacl/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c path=/usr/bin/chacl) -eq 1 ]; then
+    echo "Unsuccessful chacl events set on running config: "
+else
+    echo "Unsuccessful chacl events not set on running config: "
+fi
 
 # 4.1.3.18
 
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/sbin\/usermod/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(grep -c usermod /etc/audit/rules.d/50-usermod.rules) -eq 1 ]; then
+    echo "Unsuccessful chacl events set on disk config: "
+else
+    echo "Unsuccessful chacl events not set on disk config: "
+fi
 
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/sbin\/usermod/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
+if [ $(auditctl -l | grep -c usermod) -eq 1 ]; then
+    echo "Unsuccessful chacl events set on running config: "
+else
+    echo "Unsuccessful chacl events not set on running config: "
+fi
 
 # 4.1.3.19
 
-awk '/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ 
-&&(/ -F auid!=unset/||/ -F auid!=-1/||/ -F auid!=4294967295/) \ 
-&&/ -S/ \ 
-&&(/init_module/ \ 
-    ||/finit_module/ \ 
-    ||/delete_module/ \ 
-    ||/create_module/ \ 
-    ||/query_module/) \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
-
-[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/kmod/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
-
-auditctl -l | awk '/^ *-a *always,exit/ \ 
-&&/ -F *arch=b[2346]{2}/ \ 
-&&(/ -F auid!=unset/||/ -F auid!=-1/||/ -F auid!=4294967295/) \ 
-&&/ -S/ \ 
-&&(/init_module/ \ 
-    ||/finit_module/ \ 
-    ||/delete_module/ \ 
-    ||/create_module/ \ 
-    ||/query_module/) \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
-
-[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \ 
-&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \ 
-&&/ -F *auid>=${UID_MIN}/ \ 
-&&/ -F *perm=x/ \ 
-&&/ -F *path=\/usr\/bin\/kmod/ \ 
-&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \ || printf "ERROR: Variable 'UID_MIN' is unset.\n"
-
-S_LINKS=$(ls -l /usr/sbin/lsmod /usr/sbin/rmmod /usr/sbin/insmod /usr/sbin/modinfo /usr/sbin/modprobe /usr/sbin/depmod | grep -v " -> ../bin/kmod" || true) \ 
-&& if [[ "${S_LINKS}" != "" ]]; then 
-    printf "Issue with symlinks: ${S_LINKS}\n"; 
-else 
-    printf "OK\n"; 
+if [ $(grep -c kernel_modules /etc/audit/rules.d/50-kernel_modules.rules) -eq 2 ]; then
+    echo "Unsuccessful chacl events set on disk config: "
+else
+    echo "Unsuccessful chacl events not set on disk config: "
 fi
 
-grep "^\s*[^#]" /etc/audit/rules.d/*.rules | tail -1
+if [ $(auditctl -l | grep -c kernel_modules) -eq 2 ]; then
+    echo "Unsuccessful chacl events set on running config: "
+else
+    echo "Unsuccessful chacl events not set on running config: "
+fi
 
-
+if (grep "^\s*[^#]" /etc/audit/rules.d/*.rules | tail -1 | cut ':' -f 2) == "-e 2"; then
+    echo "Audit configuration set to immutable: "
+else
+    echo "Audit configuration not set to immutable: "
+fi
 
