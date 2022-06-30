@@ -58,26 +58,69 @@ else
 fi
 
 ##4.1.3.1 Ensure changes to system administration scope (sudoers) is collected
-grep -c “scope” /etc/audit/rules.d/50-scope.rules
+if [ $(grep -c scope /etc/audit/rules.d/50-scope.rules) -eq 2]; then
+	echo -e "exists: \033[1;32mOK\033[0m"
+else
+	echo -e "does not exist: \033[1;31mERROR\033[0m"
+fi
 
-auditctl -l | grep -c “scope”
+if [$(auditctl -l | grep -c scope) -eq 2]; then
+	echo -e "Successful in setting system administration scope: \033[1;32mOK\033[0m"
+else
+	echo -e "Unuccessful in setting system administration scope: \033[1;31mERROR\033[0m"
+fi
 
 ##4.1.3.2 Ensure actions as another user are always logged
-grep -c “user_emulation” /etc/audit/rules.d/50-user_emulation.rules
+if [ $(grep -c user_emulation /etc/audit/rules.d/50-user_emulation.rules) -eq 2]; then
+	echo -e "exists: \033[1;32mOK\033[0m"
+else
+	echo -e "does not exist: \033[1;31mERROR\033[0m"
+fi
 
-auditctl -l | grep -c “user_emulation”
+if [$(auditctl -l | grep -c user_emulation) -eq 2]; then
+	echo -e "Successful in setting emulation rules: \033[1;32mOK\033[0m"
+else
+	echo -e "Unuccessful in setting emulation rules: \033[1;31mERROR\033[0m"
+fi
 
 ##4.1.3.3 Ensure events that modify the sudo log file are collected
-grep -c “sudo_log_file” /etc/audit/rules.d/50-sudo.rules
+if [ $(grep -c sudo_log_file /etc/audit/rules.d/50-sudo.rules) -eq 1]; then
+	echo -e "exists: \033[1;32mOK\033[0m"
+else
+	echo -e "does not exist: \033[1;31mERROR\033[0m"
+fi
 
-auditctl -l | grep -c “sudo_log_file”
+if [$(auditctl -l | grep -c sudo_log_file) -eq 1]; then
+	echo -e "Successful in modifying sudo log files: \033[1;32mOK\033[0m"
+else
+	echo -e "Unuccessful in modifying sudo log files: \033[1;31mERROR\033[0m"
+fi
 
 ##4.1.3.4 Ensure events that modify date and time information are collected
-grep -c “time-change” /etc/audit/rules.d/50-time-change.rules
+if [ $(grep -c time-change /etc/audit/rules.d/50-time-change.rules) -eq 3]; then
+	echo -e "exists: \033[1;32mOK\033[0m"
+else
+	echo -e "does not exist: \033[1;31mERROR\033[0m"
+fi
 
-auditctl -l | grep -c “time-change”
+if [$(auditctl -l | grep -c time-change) -eq 3]; then
+	echo -e "Successful in modifying system dates: \033[1;32mOK\033[0m"
+else
+	echo -e "Unuccessful in modifying system dates: \033[1;31mERROR\033[0m"
+fi
 
 ##4.1.3.5 Ensure events that modify the system's network environment are collected
-grep -c “system-locale” /etc/audit/rules.d/50-system_local.rules
+if [ $(grep -c system-locale /etc/audit/rules.d/50-system_local.rules) -eq 7]; then
+	echo -e "exists: \033[1;32mOK\033[0m"
+else
+	echo -e "does not exist: \033[1;31mERROR\033[0m"
+fi
 
-auditctl -l | grep -c “system-locale”
+if [$(auditctl -l | grep -c system-locale) -eq 7]; then
+	echo -e "Successful in setting system local rules: \033[1;32mOK\033[0m"
+else
+	echo -e "Unuccessful in setting system local rules: \033[1;31mERROR\033[0m"
+fi
+
+
+
