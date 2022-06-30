@@ -58,30 +58,32 @@ else
 fi
 
 ##4.1.3.1 Ensure changes to system administration scope (sudoers) is collected
-if awk '/^ *-w/ \ &> /dev/null; then
-   echo -e "System administrator scope is set: \033[1;32mOK\033[0m"
-else   
-  echo -e "System administrator scope is not set: \033[1;31mERROR\033[0m"
-fi
+awk '/^ *-w/ \
+&&/\/etc\/sudoers/ \
+&&/ +-p *wa/ \
+&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
 
-if auditctl -l | awk '/^ *-w/ \ &> /dev/null; then
-   echo -e "Rules loaded: \033[1;32mOK\033[0m"
-else   
-  echo -e "Rules not loaded: \033[1;31mERROR\033[0m"
-fi
+auditctl -l | awk '/^ *-w/ \
+&&/\/etc\/sudoers/ \
+&&/ +-p *wa/ \
+&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+
 
 ##4.1.3.2 Ensure actions as another user are always logged
-if awk '/^ *-a *always,exit/ \ &> /dev/null; then
-   echo -e "User emulation rules set: \033[1;32mOK\033[0m"
-else   
-  echo -e "User emulation rules is not set: \033[1;31mERROR\033[0m"
-fi
+awk '/^ *-a *always,exit/ \
+&&/ -F *arch=b[2346]{2}/ \
+&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+&&(/ -C *euid!=uid/||/ -C *uid!=euid/) \
+&&/ -S *execve/ \
+&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
 
-if auditctl -l | awk '/^ *-a *always,exit/ \ &> /dev/null; then
-   echo -e "Rules loaded: \033[1;32mOK\033[0m"
-else   
-  echo -e "Rules not loaded: \033[1;31mERROR\033[0m"
-fi
+ auditctl -l | awk '/^ *-a *always,exit/ \
+&&/ -F *arch=b[2346]{2}/ \
+&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+&&(/ -C *euid!=uid/||/ -C *uid!=euid/) \
+&&/ -S *execve/ \
+&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+
 
 ##4.1.3.3 Ensure events that modify the sudo log file are collected
 
