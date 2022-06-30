@@ -224,7 +224,7 @@ echo "Setting audit configuration to immutable..."
 echo "-e 2" > /etc/audit/rules.d/99-finalize.rules
 
 echo "Loading audit rules..."
-augenrules --load &>
+augenrules --load &> /dev/null
 
 if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then 
     printf "Reboot required to load rules\n"; 

@@ -127,19 +127,21 @@ else
 fi
 
 ##4.1.3.5 Ensure events that modify the system's network environment are collected
-if [ $(grep -c system-locale /etc/audit/rules.d/50-system_local.rules) -eq 7]; then
+if [ $(grep -c system-locale /etc/audit/rules.d/50-system_local.rules) -eq 7 ]; then
 	echo -e "exists: \033[1;32mOK\033[0m"
     let COUNTER++
 else
 	echo -e "does not exist: \033[1;31mERROR\033[0m"
 fi
 
-if [$(auditctl -l | grep -c system-locale) -eq 7]; then
+if [$(auditctl -l | grep -c system-locale) -eq 7 ]; then
 	echo -e "Successful in setting system local rules: \033[1;32mOK\033[0m"
     let COUNTER++
 else
 	echo -e "Unuccessful in setting system local rules: \033[1;31mERROR\033[0m"
 fi
+
+# 4.1.3.7
 
 if [ $(grep -c access /etc/audit/rules.d/50-access.rules) -eq 4 ]; then
     echo "Access rules for file systems set on disk config: \033[1;32mOK\033[0m"
@@ -403,4 +405,4 @@ else
 	echo -e "rsyslog is configured to recieve logs from a remote client: \033[1;31mERROR\033[0m"
 fi
 
-printf "Finished auditing with score: $COUNTER/48"
+printf "Finished auditing with score: $COUNTER/48 \n"
