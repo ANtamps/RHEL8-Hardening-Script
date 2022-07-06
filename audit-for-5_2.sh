@@ -9,6 +9,7 @@ if [ $(stat -c %u /etc/ssh/sshd_config) -eq 0 ]; then
         echo -e "Permissions set to read-only for root: \033[1;32mOK\033[0m"
     else
         echo -e "Permissions not set to read-only for root: \033[1;31mERROR\033[0m"
+    fi
 else
     echo -e "File not owned by root: \033[1;31mERROR\033[0m"
 fi
