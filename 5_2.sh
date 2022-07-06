@@ -10,14 +10,14 @@ chmod og-rwx /etc/ssh/sshd_config
 # 5.2.2 Ensure permissions on SSH private host key files are configured
 
 echo "Making ssh private keys only owner read/writable..."
-find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -exec chmod u-x,g-wx,o-rwx {} \;
+find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -exec chmod u=rw,g=r,o= {} \;
 echo "Making ssh private keys ownership to root..."
 find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -exec chown root:ssh_keys {} \;
 
 # 5.2.3 Ensure permissions on SSH public host key files are configured
 
 echo "Making ssh public keys only owner read/writable..."
-find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' -exec chmod u-x,go-wx {} \;
+find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' -exec chmod u=rw,go= {} \;
 echo "Making ssh public keys ownership to root..."
 find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' -exec chown root:root {} \;
 
