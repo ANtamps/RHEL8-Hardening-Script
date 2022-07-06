@@ -18,7 +18,7 @@ fi
 
 ssh_priv_keys=$(find /etc/ssh -xdev -type f -name 'ssh_host_*_key')
 
-for file in ssh_priv_keys
+for file in $ssh_priv_keys
 do
     if [ $(stat -c %u $file) -eq 0 ] && [ $(stat -c %g $file) -eq 995 ] && [ $(stat -c %a $file) -eq 640 ]; then
         echo -e "$(stat -c %n $file) has root ownership & part of ssh_keys group, and has appropriate permissions: \033[1;32mOK\033[0m"
@@ -31,7 +31,7 @@ done
 
 ssh_pub_keys = $(find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub')
 
-for file in ssh_pub_keys
+for file in $ssh_pub_keys
 do
     if [ $(stat -c %a $file) -eq 600 ]; then
         echo -e "File permission for $(stat -c %n $file) is set to 600: \033[1;32mOK\033[0m"
@@ -82,7 +82,7 @@ fi
 
 # 5.2.10 Ensure SSH PermitUserEnvironment is disabled
 
-if sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep "permituserenvironment no" &> /dev/null; then
+if sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep -i "permituserenvironment no" &> /dev/null; then
     echo -e "SSH PermitUserEnvironment is disabled: \033[1;32mOK\033[0m"
 else
     echo -e "SSH PermitUserEnvironment is not disabled: \033[1;31mERROR\033[0m"
@@ -90,7 +90,7 @@ fi
 
 # 5.2.11 Ensure SSH IgnoreRhosts is enabled
 
-if sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep "ignorerhosts no" &> /dev/null; then
+if sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep "ignorerhosts yes" &> /dev/null; then
     echo -e "SSH IgnoreRhosts is enabled: \033[1;32mOK\033[0m"
 else
     echo -e "SSH IgnoreRhosts is not enabled: \033[1;31mERROR\033[0m"
@@ -115,9 +115,9 @@ fi
 # 5.2.14 Ensure system-wide crypto policy is not over-ridden
 
 if ! grep -i '^\s*CRYPTO_POLICY=' /etc/sysconfig/sshd; then
-    echo "System-wide crypto policy is not over-ridden: \033[1;32mOK\033[0m"
+    echo -e"System-wide crypto policy is not over-ridden: \033[1;32mOK\033[0m"
 else
-    echo "System-wide crypto policy is over-ridden: \033[1;31mERROR\033[0m"
+    echo -e "System-wide crypto policy is over-ridden: \033[1;31mERROR\033[0m"
 fi
 
 # 5.2.15 Ensure SSH warning banner is configured
