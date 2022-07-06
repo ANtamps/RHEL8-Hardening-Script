@@ -29,7 +29,7 @@ done
 
 # 5.2.3 Ensure permissions on SSH public host key files are configured
 
-ssh_pub_keys = $(find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub')
+ssh_pub_keys=$(find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub')
 
 for file in $ssh_pub_keys
 do
@@ -106,7 +106,7 @@ fi
 
 # 5.2.13 Ensure SSH AllowTcpForwarding is disabled
 
-if sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep - i "allowtcpforwarding no" &> /dev/null; then
+if sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep -i "allowtcpforwarding no" &> /dev/null; then
     echo -e "SSH AllowTcpForwarding is disabled: \033[1;32mOK\033[0m"
 else
     echo -e "SSH AllowTcpForwarding is not disabled: \033[1;31mERROR\033[0m"
@@ -115,7 +115,7 @@ fi
 # 5.2.14 Ensure system-wide crypto policy is not over-ridden
 
 if ! grep -i '^\s*CRYPTO_POLICY=' /etc/sysconfig/sshd; then
-    echo -e"System-wide crypto policy is not over-ridden: \033[1;32mOK\033[0m"
+    echo -e "System-wide crypto policy is not over-ridden: \033[1;32mOK\033[0m"
 else
     echo -e "System-wide crypto policy is over-ridden: \033[1;31mERROR\033[0m"
 fi
