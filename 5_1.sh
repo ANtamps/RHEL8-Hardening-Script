@@ -48,7 +48,9 @@ fi
 
 ##5.1.8 Ensure cron is restricted to authorized users
 dnf remove cronie
+echo "removing cronie.."
 
 ##5.1.9 Ensure at is restricted to authorized users
 dnf remove at
+echo "removing at.."
 
