@@ -56,10 +56,8 @@ echo -e "!authenticate  removed from the lines, continuing.."
 fi
 
 ##5.3.6 Ensure sudo authentication timeout is configured correctly
-echo -e "Defaults env_reset, timestamp_timeout=15" >>/etc/suduoers
-echo -e "Defaults timestamp_timeout=15" >>/etc/suduoers
-echo -e "Defaults env_reset" >>/etc/suduoers
-echo -e "sudo authentication timeoutt is configured, continuing.."
+sed -i 's/Defaults    env_reset/Defaults    env_reset, timestamp_timeout=15/g' /etc/suduoers
+echo -e "sudo authentication timeout is configured correctly, continuing.."
 
 ##5.3.7 Ensure access to the su command is restricted
 if grep sugroup /etc/group; then
