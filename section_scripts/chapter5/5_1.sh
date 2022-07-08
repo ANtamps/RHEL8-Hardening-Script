@@ -4,8 +4,8 @@
 
 ##5.1.1 Ensure cron daemon is enabled 
  if  systemctl is-enabled crond &> /dev/null; then
-    echo "cron daemon already enabled, continuing..."
     systemctl --now enable crond
+    echo "cron daemon already enabled, continuing..."
 else   
     echo "cron daemon not found, enabling..."
     systemctl --now enable crond
