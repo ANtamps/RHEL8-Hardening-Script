@@ -53,14 +53,16 @@ fi
 
 ##5.1.8 Ensure cron is restricted to authorized users
 if rpm -q cronie >/dev/null; then
-    echo -e "cron not installed: \033[1;32mOK\033[0m"
-else
     echo -e "cron still installed: \033[1;31mERROR\033[0m"
+else
+   echo -e "cron not installed: \033[1;32mOK\033[0m"
+
 fi
 
 ##5.1.9 Ensure at is restricted to authorized users
 if rpm -q at >/dev/null; then
-  echo -e "at not installed: \033[1;32mOK\033[0m"
+  echo -e "at still installed: \033[1;31mERROR\033[0m"
 else
-    echo -e "at still installed: \033[1;31mERROR\033[0m"
+    echo -e "at not installed: \033[1;32mOK\033[0m"
+
 fi
