@@ -47,10 +47,10 @@ fi
  echo "Permissions on /etc/cron.d configured, continuing.."
 
 ##5.1.8 Ensure cron is restricted to authorized users
-dnf remove cronie
+dnf -y remove cronie
 echo "removing cronie.."
 
 ##5.1.9 Ensure at is restricted to authorized users
-dnf remove at
+dnf -y remove at
 echo "removing at.."
 
