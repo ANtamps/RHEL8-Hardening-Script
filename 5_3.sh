@@ -32,14 +32,14 @@ echo -e "Defaults logfile=/var/log/sudo.log" >>/etc/suduoers
 
 fi
  
-
 ##5.3.4 Ensure users must provide password for escalation
 if grep -q "NOPASSWD" /etc/suduoers; then
 
 echo -e "NOPASSWD still exists, removing.."
-   rm "NOPASSWD" >> /etc/suduoers
-   
+   sed '/NOPASSWD/d' /etc/suduoers
+
 else
+  sed '/NOPASSWD/d' /etc/suduoers
 echo -e "NOPASSWD removed from the lines, continuing.."
 
 fi
@@ -48,9 +48,10 @@ fi
 if grep -q "!authenticate" /etc/suduoers; then
 
 echo -e "!authenticate still exists, removing.."
- rm "!authenticate" >> /etc/suduoers
+  sed '/!authenticate/d' /etc/suduoers
    
 else
+  sed '/!authenticate/d' /etc/suduoers
 echo -e "!authenticate  removed from the lines, continuing.."
 
 fi
