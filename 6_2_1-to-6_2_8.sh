@@ -128,7 +128,7 @@ done
 
 root_uid_check=$(awk -F: '($3 == 0) { print $1 }' /etc/passwd)
 
-if [ ( $(awk -F: '($3 == 0) { print $1 }' /etc/passwd) | wc -l) -eq 1 ]; then
+if [ $(awk -F: '($3 == 0) { print $1 }' /etc/passwd | wc -l) -eq 1 ]; then
     echo "Root is only user with UID of 0, continuing..."
 else
     for user in $root_uid_check
