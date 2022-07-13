@@ -86,7 +86,7 @@ if [ $group_name_counter -eq 0 ]; then
     echo -e "No duplicate group names found: \033[1;32mOK\033[0m"
 fi
 
-if [ ($(awk -F: '($3 == 0) { print $1 }' /etc/passwd) | wc -l) -eq 1 ] && [ ($(awk -F: '($3 == 0) { print $1 }' /etc/passwd) | grep root)  ]; then
+if [ $(awk -F: '($3 == 0) { print $1 }' /etc/passwd | wc -l) -eq 1 ] && [ $(awk -F: '($3 == 0) { print $1 }' /etc/passwd | grep -c root) -eq 1 ]; then
     echo -e "Root is only user with UID of 0: \033[1;32mOK\033[0m"
 else
     echo -e "Root not only user with UID of 0: \033[1;31mERROR\033[0m"
