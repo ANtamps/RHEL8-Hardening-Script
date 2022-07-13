@@ -1,9 +1,5 @@
 #!/bin/bash
 
-COUNTER=0
-
-echo "Creating audit logs error file..."
-touch chapter6-audit-error.log
 
 ##6.1
 
@@ -15,7 +11,7 @@ if  df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev 
     let COUNTER++
 else
     echo -e "Sticky bit is not set: \033[1;31mERROR\033[0m"
-    echo -e "Sticky bit is not set: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Sticky bit is not set: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.3 Ensure permissions on /etc/passwd are configured 
@@ -24,7 +20,7 @@ if stat /etc/passwd &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/passwd not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/passwd not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/passwd not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.4 Ensure permissions on /etc/shadow are configured
@@ -33,7 +29,7 @@ if stat /etc/shadow &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/shadow not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/shadow not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/shadow not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.5 Ensure permissions on /etc/group are configured
@@ -42,7 +38,7 @@ if stat /etc/group &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/group not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/group not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/group not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.6 Ensure permissions on /etc/gshadow are configured
@@ -51,7 +47,7 @@ if stat /etc/gshadow &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/gshadow not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/gshadow not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/gshadow not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.7 Ensure permissions on /etc/passwd- are configured
@@ -59,7 +55,7 @@ if stat /etc/passwd- &> /dev/null; then
     echo -e "Permissions on /etc/passwd- configured: \033[1;32mOK\033[0m"
     let COUNTER++
 else
-    echo -e "Permissions on /etc/passwd- not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/passwd- not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.8 Ensure permissions on /etc/shadow- are configured
@@ -68,8 +64,7 @@ if stat /etc/shadow- &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/shadow- not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/shadow- not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
-fi 
+    echo -e "Permissions on /etc/shadow- not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 
 ##6.1.9 Ensure permissions on /etc/group- are configured
 if stat /etc/group- &> /dev/null; then
@@ -77,7 +72,7 @@ if stat /etc/group- &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/group- not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/group- not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/group- not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.10 Ensure permissions on /etc/gshadow- are configured 
@@ -86,7 +81,7 @@ if stat /etc/gshadow- &> /dev/null; then
     let COUNTER++
 else
     echo -e "Permissions on /etc/gshadow- not configured: \033[1;31mERROR\033[0m"
-    echo -e "Permissions on /etc/gshadow- not configured: \033[1;31mERROR\033[0m" >> chapter6-audit-error.log
+    echo -e "Permissions on /etc/gshadow- not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##6.1.11 Ensure no world writable files exist
