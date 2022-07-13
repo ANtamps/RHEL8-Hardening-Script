@@ -84,17 +84,7 @@ else
     echo -e "Permissions on /etc/gshadow- not configured: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
-##6.1.11 Ensure no world writable files exist
 
-##6.1.12 Ensure no unowned files or directories exist
-
-##6.1.13 Ensure no ungrouped files or directories exist
-
-##6.1.14 Audit SUID executables (Manual)
-
-##6.1.15 Audit SGID executables (Manual)
-
-
-printf "Finished auditing with score: $COUNTER/12 \n"
+printf "Finished auditing with score: $COUNTER/9 \n"
 
 
