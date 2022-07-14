@@ -2038,13 +2038,9 @@ else
 
 fi
 
-if grep -q "TMOUT=900" /etc/bashrc &&
-grep -q "readonly TMOUT" /etc/bashrc &&
-grep -q "export TMOUT" /etc/bashrc; then
-
+if grep -q "TMOUT=900" /etc/bashrc && grep -q "readonly TMOUT" /etc/bashrc && grep -q "export TMOUT" /etc/bashrc; then
     echo -e "Default user shell timeout is set to 900 seconds in /etc/bashrc: \033[1;32mOK\033[0m"
     let COUNTER++
-
 else
     echo -e "Default user shell timeout is not set to 900 seconds in /etc/bashrc: \033[1;31mERROR\033[0m"
     echo -e "Default user shell timeout is not set to 900 seconds in /etc/bashrc: \033[1;31mERROR\033[0m" >> audit-error.log
