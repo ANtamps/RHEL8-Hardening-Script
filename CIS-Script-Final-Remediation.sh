@@ -1,5 +1,57 @@
 #!/bin/bash
 
+cat << "EOF"
+=====================================================================
+  _____       _                     _____           _       _   
+ |_   _|     | |                   / ____|         (_)     | |  
+   | |  _ __ | |_ ___ _ __ _ __   | (___   ___ _ __ _ _ __ | |_ 
+   | | | '_ \| __/ _ \ '__| '_ \   \___ \ / __| '__| | '_ \| __|
+  _| |_| | | | ||  __/ |  | | | |  ____) | (__| |  | | |_) | |_ 
+ |_____|_| |_|\__\___|_|  |_| |_| |_____/ \___|_|  |_| .__/ \__|
+                                                     | |        
+                                                     |_|  
+	         
+			 By: Benlot,  Tampoy, and Vero										
+=====================================================================													 
+EOF
+
+echo -e "Welcome to the Intern Script, check out the menu\n"
+echo "(1) Run the script using firewalld"
+echo "(2) Run the script using nftables"
+echo "(3) Run the script using iptables"
+echo "(4) Quit the program"
+
+PS3="Enter your preferred firewall: "
+options=("firewalld" "nftables" "iptables" "quit")
+
+select opt in "${options[@]}"
+do
+	case $opt in
+		"firewalld")
+			echo -e "\nRunning script with firewalld..."
+			firewall_value=1
+			break
+			;;
+		"nftables")
+			echo -e "\nRunning script with nftables..."
+			firewall_value=2
+			break
+			;;
+		"iptables")
+			echo -e "\nRunning script with iptables..."
+			firewall_value=3
+			break
+			;;
+		"quit")
+			echo -e "\nQuitting program..."
+			break
+			;;
+		*) echo "Invalid option $REPLY";;
+	esac 
+done
+		
+
+
 
 ##1.2.3 Ensure gpgcheck is globally activated (Automated)##
 sed -i 's/^gpgcheck\s*=\s*.*/gpgcheck=1/' /etc/dnf/dnf.conf
@@ -870,256 +922,262 @@ fi
 
 ##3.4.1 
 
-##3.4.1.1 Ensure firewalld is installed
-if rpm -q firewalld iptables &> /dev/null; then
-    echo "FirewallD and iptables installed, continuing..."
-else   
-    echo "ip tables not found, installing..."
-    dnf -y install firewalld iptables &> /dev/null
-fi
-##3.4.1.2 Ensure iptables-services not installed with firewalld
+if [ $firewall_value -eq 1 ]; then
 
-if rpm -q iptables-services &> /dev/null; then
-    echo "package iptables-services  found, removing..."
-    sudo yum -y install iptables-services
-    systemctl stop iptables
-    dnf -y remove iptables-services
+	##3.4.1.1 Ensure firewalld is installed
+	if rpm -q firewalld iptables &> /dev/null; then
+		echo "FirewallD and iptables installed, continuing..."
+	else   
+		echo "ip tables not found, installing..."
+		dnf -y install firewalld iptables &> /dev/null
+	fi
+	##3.4.1.2 Ensure iptables-services not installed with firewalld
 
-else   
-    echo "Package iptables-services is not installed, continuing..."
-fi
+	if rpm -q iptables-services &> /dev/null; then
+		echo "package iptables-services  found, removing..."
+		sudo yum -y install iptables-services
+		systemctl stop iptables
+		dnf -y remove iptables-services
 
-##3.4.1.3 Ensure nftables either not installed or masked with firewalld 
+	else   
+		echo "Package iptables-services is not installed, continuing..."
+	fi
 
-if  rpm -q nftables &> /dev/null; then
-    echo "nftables installed, removing..."
-    dnf -y remove nftables &> /dev/null
-else
-    echo "nftables not installed, continuing..."
-fi
+	##3.4.1.3 Ensure nftables either not installed or masked with firewalld 
 
-##3.4.1.4 Ensure firewalld service enabled and running
+	if  rpm -q nftables &> /dev/null; then
+		echo "nftables installed, removing..."
+		dnf -y remove nftables &> /dev/null
+	else
+		echo "nftables not installed, continuing..."
+	fi
+
+	##3.4.1.4 Ensure firewalld service enabled and running
+		
+	if   systemctl is-enabled firewalld &> /dev/null; then
+		echo "already enabled, continuing..."
 	
-if   systemctl is-enabled firewalld &> /dev/null; then
-    echo "already enabled, continuing..."
-   
-else
-    echo "firewalld is still masked, enabling..."
-	sudo yum -y install firewalld
-	systemctl unmask firewalld
+	else
+		echo "firewalld is still masked, enabling..."
+		sudo yum -y install firewalld
+		systemctl unmask firewalld
+	fi
+
+	if    firewall-cmd --state &> /dev/null; then
+		echo "already running, continuing..."
+	
+	else
+		echo "firewalld is not running, enabling..."
+		systemctl --now enable firewalld
+	fi
+	##3.4.1.5 Ensure firewalld default zone is set 
+		firewall-cmd --set-default-zone=public
+
+	##3.4.1.6 Ensure network interfaces are assigned to appropriate zone (Manual)
+	##3.4.1.7 Ensure firewalld drops unnecessary services and ports (Manual)
 fi
-
-if    firewall-cmd --state &> /dev/null; then
-    echo "already running, continuing..."
-   
-else
-    echo "firewalld is not running, enabling..."
-	systemctl --now enable firewalld
-fi
-##3.4.1.5 Ensure firewalld default zone is set 
-	 firewall-cmd --set-default-zone=public
-
-##3.4.1.6 Ensure network interfaces are assigned to appropriate zone (Manual)
-##3.4.1.7 Ensure firewalld drops unnecessary services and ports (Manual)
-
 
 ##3.4.2
 
-##3.4.2.1 Ensure nftables is installed (Automated)
+if [ $firewall_value -eq 2 ]; then
+	##3.4.2.1 Ensure nftables is installed (Automated)
 
-if  rpm -q nftables &> /dev/null; then
-    echo "nftables installed, continuing..."
-else   
-    echo "nftables not found, installing..."
-     dnf -y install nftables &> /dev/null
-fi
+	if  rpm -q nftables &> /dev/null; then
+		echo "nftables installed, continuing..."
+	else   
+		echo "nftables not found, installing..."
+		dnf -y install nftables &> /dev/null
+	fi
 
-##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
+	##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
 
-if rpm -q iptables-services &> /dev/null; then
-   echo "Firewalld found.. masking.."
-   systemctl --now mask firewalld
-
-else   
-    echo "Firewalld is masked, continuing..."
+	if rpm -q iptables-services &> /dev/null; then
+	echo "Firewalld found.. masking.."
 	systemctl --now mask firewalld
+
+	else   
+		echo "Firewalld is masked, continuing..."
+		systemctl --now mask firewalld
+	fi
+
+	##3.4.2.3 Ensure iptables-services not installed with nftables
+
+	if  rpm -q iptables-services &> /dev/null; then
+		echo "iptables-services installed, removing..."
+		dnf -y remove iptables-services &> /dev/null
+	else
+		echo "iptables-services not installed, continuing..."
+		dnf -y remove iptables-services
+	fi
+
+	##3.4.2.4 Ensure iptables are flushed with nftables (Manual)
+
+	##3.4.2.5 Ensure an nftables table exists
+	nft create table inet filter
+
+	##3.4.2.6 Ensure nftables base chains exist
+	nft create chain inet filter input { type filter hook input priority 0 \; }
+	nft create chain inet filter forward { type filter hook forward priority 0 \; }
+	nft create chain inet filter output { type filter hook output priority 0 \; }
+
+	##3.4.2.7 Ensure nftables loopback traffic is configured
+	if  nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /dev/null; then
+	nft add rule inet filter input iif lo accept
+	echo "Loopback interface already configured, continuing.."
+		
+	else
+		echo "Loopback interface is not set, configuring.."
+		nft add rule inet filter input iif lo accept
+	fi
+
+	##3.4.2.8 Ensure nftables outbound and established connections are configured (Manual)
+
+	##3.4.2.9 Ensure nftables default deny firewall policy (Automated)
+	nft chain inet filter input { policy drop \; }
+	nft chain inet filter forward { policy drop \; }
+	nft chain inet filter output { policy drop \; }
+
+	##3.4.2.10 Ensure nftables service is enabled
+	if  systemctl is-enabled nftables &> /dev/null; then
+		systemctl enable nftables
+		echo "nftables services enabled, continuing..."
+	else   
+		echo "nftables services not enabled, configuring..."
+		sudo yum -y install nftables
+		systemctl enable nftables
+	fi
 fi
 
-##3.4.2.3 Ensure iptables-services not installed with nftables
+if [ $firewall_value -eq 3 ]; then
+	# 3.4.3.1.1 Ensure iptables packages are installed
 
-if  rpm -q iptables-services &> /dev/null; then
-    echo "iptables-services installed, removing..."
-    dnf -y remove iptables-services &> /dev/null
-else
-    echo "iptables-services not installed, continuing..."
-    dnf -y remove iptables-services
-fi
+	if rpm -q iptables ip tables-services &> /dev/null; then
+		echo "iptables installed, continuing..."
+	else   
+		echo "ip tables not found, installing..."
+		dnf -y install iptables iptables-services &> /dev/null
+	fi
 
-##3.4.2.4 Ensure iptables are flushed with nftables (Manual)
+	# 3.4.3.1.2 Ensure nftables is not installed with iptables
 
-##3.4.2.5 Ensure an nftables table exists
- nft create table inet filter
+	if rpm -q nftables &> /dev/null; then
+		echo "nftables installed, removing..."
+		dnf remove nftables &> /dev/null
+	else
+		echo "nftables not installed, continuing..."
+	fi
 
-##3.4.2.6 Ensure nftables base chains exist
-nft create chain inet filter input { type filter hook input priority 0 \; }
-nft create chain inet filter forward { type filter hook forward priority 0 \; }
-nft create chain inet filter output { type filter hook output priority 0 \; }
+	# 3.4.3.1.3 Ensure firewalld is removed or masked with iptables
 
-##3.4.2.7 Ensure nftables loopback traffic is configured
-if  nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /dev/null; then
-   nft add rule inet filter input iif lo accept
-   echo "Loopback interface already configured, continuing.."
-    
-else
-    echo "Loopback interface is not set, configuring.."
-    nft add rule inet filter input iif lo accept
-fi
+	if rpm -q firewalld &> /dev/null; then
+		echo "firewalld installed, removing..."
+		dnf remove firewalld &> /dev/null
+	else
+		echo "firewalld not installed, continuing..."
+	fi
 
-##3.4.2.8 Ensure nftables outbound and established connections are configured (Manual)
+	# 
 
-##3.4.2.9 Ensure nftables default deny firewall policy (Automated)
-nft chain inet filter input { policy drop \; }
-nft chain inet filter forward { policy drop \; }
-nft chain inet filter output { policy drop \; }
+	# Flush IPtables rules 
 
-##3.4.2.10 Ensure nftables service is enabled
-if  systemctl is-enabled nftables &> /dev/null; then
-    systemctl enable nftables
-    echo "nftables services enabled, continuing..."
-else   
-     echo "nftables services not enabled, configuring..."
-     sudo yum -y install nftables
-     systemctl enable nftables
-fi
+	iptables -F 
 
-# 3.4.3.1.1 Ensure iptables packages are installed
+	# Ensure default deny firewall policy 
 
-if rpm -q iptables ip tables-services &> /dev/null; then
-    echo "iptables installed, continuing..."
-else   
-    echo "ip tables not found, installing..."
-    dnf -y install iptables iptables-services &> /dev/null
-fi
+	iptables -P INPUT DROP iptables -P OUTPUT DROP iptables -P FORWARD DROP 
 
-# 3.4.3.1.2 Ensure nftables is not installed with iptables
+	# Ensure loopback traffic is configured 
 
-if rpm -q nftables &> /dev/null; then
-    echo "nftables installed, removing..."
-    dnf remove nftables &> /dev/null
-else
-    echo "nftables not installed, continuing..."
-fi
+	iptables -A INPUT -i lo -j ACCEPT iptables -A OUTPUT -o lo -j ACCEPT 
 
-# 3.4.3.1.3 Ensure firewalld is removed or masked with iptables
+	iptables -A INPUT -s 127.0.0.0/8 -j DROP 
 
-if rpm -q firewalld &> /dev/null; then
-    echo "firewalld installed, removing..."
-    dnf remove firewalld &> /dev/null
-else
-    echo "firewalld not installed, continuing..."
-fi
+	# Ensure outbound and established connections are configured 
 
-# 
+	iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT 
 
-# Flush IPtables rules 
+	iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT 
 
-iptables -F 
+	iptables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT 
 
-# Ensure default deny firewall policy 
+	iptables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT 
 
-iptables -P INPUT DROP iptables -P OUTPUT DROP iptables -P FORWARD DROP 
+	iptables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT 
 
-# Ensure loopback traffic is configured 
+	iptables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT 
 
-iptables -A INPUT -i lo -j ACCEPT iptables -A OUTPUT -o lo -j ACCEPT 
+	# Open inbound ssh(tcp port 22) connections 
 
-iptables -A INPUT -s 127.0.0.0/8 -j DROP 
+	iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 
-# Ensure outbound and established connections are configured 
+	# 3.4.3.2.4 Ensure iptables default deny firewall policy
 
-iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT 
+	iptables -p INPUT DROP
+	iptables -p OUTPUT DROP
+	iptables -P FORWARD DROP
 
-iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT 
+	# 3.4.3.2.5 Ensure iptables config is saved
 
-iptables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT 
+	service iptables save
 
-iptables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT 
+	# 3.4.3.2.6 Ensure iptables is enabled and active
 
-iptables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT 
+	if systemctl is-active iptables | grep "active" &> /dev/null; then
+		echo "iptables is activated, continuing..."
+	else
+		echo "Activating iptables..."
+		systemctl --now enable iptables
+	fi
 
-iptables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT 
+	# Flush ip6tables rules 
+	ip6tables -F 
 
-# Open inbound ssh(tcp port 22) connections 
+	# Ensure default deny firewall policy 
 
-iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+	ip6tables -P INPUT DROP ip6tables -P OUTPUT DROP ip6tables -P FORWARD DROP 
 
-# 3.4.3.2.4 Ensure iptables default deny firewall policy
+	# Ensure loopback traffic is configured 
 
-iptables -p INPUT DROP
-iptables -p OUTPUT DROP
-iptables -P FORWARD DROP
+	ip6tables -A INPUT -i lo -j ACCEPT ip6tables -A OUTPUT -o lo -j ACCEPT ip6tables -A INPUT -s ::1 -j DROP 
 
-# 3.4.3.2.5 Ensure iptables config is saved
+	# Ensure outbound and established connections are configured 
 
-service iptables save
+	ip6tables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT 
 
-# 3.4.3.2.6 Ensure iptables is enabled and active
+	ip6tables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT 
 
-if systemctl is-active iptables | grep "active" &> /dev/null; then
-    echo "iptables is activated, continuing..."
-else
-    echo "Activating iptables..."
-    systemctl --now enable iptables
-fi
+	ip6tables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT 
 
-# Flush ip6tables rules 
-ip6tables -F 
+	ip6tables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT 
 
-# Ensure default deny firewall policy 
+	ip6tables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT 
 
-ip6tables -P INPUT DROP ip6tables -P OUTPUT DROP ip6tables -P FORWARD DROP 
+	ip6tables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT 
 
-# Ensure loopback traffic is configured 
+	# Open inbound ssh(tcp port 22) connections 
 
-ip6tables -A INPUT -i lo -j ACCEPT ip6tables -A OUTPUT -o lo -j ACCEPT ip6tables -A INPUT -s ::1 -j DROP 
+	ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 
-# Ensure outbound and established connections are configured 
+	# 3.4.3.3.4 Ensure ip6tables default deny firewall policy
 
-ip6tables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT 
+	ip6tables -P INPUT DROP
 
-ip6tables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT 
+	ip6tables -P OUTPUT DROP
 
-ip6tables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT 
+	ip6tables -P FORWARD DROP
 
-ip6tables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT 
+	# 3.4.3.3.5 Ensure ip6tables config is saved
 
-ip6tables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT 
+	service ip6tables save
 
-ip6tables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT 
+	# 3.4.3.3.6 Ensure ip6tables is enabled and active
 
-# Open inbound ssh(tcp port 22) connections 
-
-ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
-
-# 3.4.3.3.4 Ensure ip6tables default deny firewall policy
-
-ip6tables -P INPUT DROP
-
-ip6tables -P OUTPUT DROP
-
-ip6tables -P FORWARD DROP
-
-# 3.4.3.3.5 Ensure ip6tables config is saved
-
-service ip6tables save
-
-# 3.4.3.3.6 Ensure ip6tables is enabled and active
-
-if systemctl is-active ip6tables | grep "active" &> /dev/null; then
-    echo "ip6tables is activated, continuing..."
-else
-    echo "Activating ip6tables..."
-    systemctl --now enable ip6tables
+	if systemctl is-active ip6tables | grep "active" &> /dev/null; then
+		echo "ip6tables is activated, continuing..."
+	else
+		echo "Activating ip6tables..."
+		systemctl --now enable ip6tables
+	fi
 fi
 
 ##4.1.1.1 Ensure auditd is installed
