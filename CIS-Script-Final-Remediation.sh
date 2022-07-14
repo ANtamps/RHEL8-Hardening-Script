@@ -40,7 +40,7 @@ do
 			;;
 		"quit")
 			echo -e "\nQuitting program..."
-			break
+			exit
 			;;
 		*) echo "Invalid option $REPLY";;
 	esac 
