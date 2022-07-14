@@ -1211,7 +1211,7 @@ else
     echo -e "Actions as another user logs is not set in disk config: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
-if [$(auditctl -l | grep -c user_emulation) -eq 2 ]; then
+if [ $(auditctl -l | grep -c user_emulation) -eq 2 ]; then
 	echo -e "Actions as another user logs is set in running config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
@@ -1228,7 +1228,7 @@ else
     echo -e "Sudo log file modification events is not set in disk config: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
-if [$(auditctl -l | grep -c sudo_log_file) -eq 1]; then
+if [ $(auditctl -l | grep -c sudo_log_file) -eq 1 ]; then
 	echo -e "Sudo log file modification events is set in running config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
