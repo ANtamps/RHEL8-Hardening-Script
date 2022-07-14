@@ -818,6 +818,7 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 	else
 		 echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m"
 		echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
+    fi
 else
 echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m"
 echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
