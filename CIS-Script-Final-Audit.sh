@@ -1388,7 +1388,7 @@ else
 fi
 
 if [ $(auditctl -l | grep -c "key=delete") -eq 2 ]; then
-    echo  "File deletion events set on running config: \033[1;32mOK\033[0m"
+    echo -e "File deletion events set on running config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
     echo -e "File deletion events not set on running config: \033[1;31mERROR\033[0m"
