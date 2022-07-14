@@ -1194,7 +1194,7 @@ else
     echo -e "Administration scope (sudo) collection is not set in disk config: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
-if [$(auditctl -l | grep -c scope) -eq 2]; then
+if [ $(auditctl -l | grep -c scope) -eq 2 ]; then
 	echo -e "Administration scope (sudo) collection is set in running config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
@@ -1237,7 +1237,7 @@ else
 fi
 
 ##4.1.3.4 Ensure events that modify date and time information are collected
-if [ $(grep -c time-change /etc/audit/rules.d/50-time-change.rules) -eq 3 ]; then
+if [ $(grep -c timechange /etc/audit/rules.d/50-time-change.rules) -eq 3 ]; then
 	echo -e "Date and time info modification events set in disk config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
