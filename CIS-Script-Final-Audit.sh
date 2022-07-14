@@ -465,7 +465,6 @@ else
 	echo -e "HTTP Proxy Server to be uninstalled: \033[1;31mREMOVE\033[0m"
 	echo -e "HTTP Proxy Server to be uninstalled: \033[1;31mREMOVE\033[0m" >> audit-error.log
 fi
-fi
 
 ##2.2.14 Ensure net-snmp is not installed (Automated)##
 if ! rpm -q net-snmp &> /dev/null; then
