@@ -1,0 +1,10 @@
+unconfined_service_t is running: [1;31mERROR[0m
+xorg-x11-server-common to be uninstalled: [1;31mREMOVE[0m
+Kernel parameter for route flush not set to 1: [1;31mERROR[0m
+Packet redirecting might not be set to 0: [1;31mERROR[0m
+Default redirect might not be set to 0: [1;31mERROR[0m
+Actions as another user logs is not set in running config: [1;31mERROR[0m
+Sudo log file modification events is not set in disk config: [1;31mERROR[0m
+Sudo log file modification events is not set in running config: [1;31mERROR[0m
+Date and time info modification events not set in running config: [1;31mERROR[0m
+File deletion events not set on running config: [1;31mERROR[0m
