@@ -651,6 +651,7 @@ else
 
 fi
 
+echo "test"
 
 # If IPv6 is enabled, uncomment this
 
@@ -672,6 +673,8 @@ fi
 #     echo "IPv6 forwarding might be enabled: \033[1;31mERROR\033[0m"
 # fi
 
+echo "test2"
+
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
     echo -e "Packet redirecting all set to 0: \033[1;32mOK\033[0m"
     let COUNTER++
@@ -685,7 +688,7 @@ if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redire
 else
     echo -e "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m"
     echo -e "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
-
+fi
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
     echo -e "Packet redirecting default set to 0: \033[1;32mOK\033[0m"
      let COUNTER++
@@ -702,6 +705,7 @@ else
 
 fi
 
+echo "test3"
 ##3.3##
 ##3.3.1 Ensure source routed packets are not accepted (Automated)##
 if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
@@ -2144,6 +2148,7 @@ if stat /etc/shadow- &> /dev/null; then
 else
     echo -e "Permissions on /etc/shadow- not configured: \033[1;31mERROR\033[0m"
     echo -e "Permissions on /etc/shadow- not configured: \033[1;31mERROR\033[0m" >> audit-error.log
+fi
 
 ##6.1.9 Ensure permissions on /etc/group- are configured
 if stat /etc/group- &> /dev/null; then
