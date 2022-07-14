@@ -84,8 +84,6 @@ else
 fi
 
 
-printf "Finished auditing with score: $COUNTER/9 \n"
-
 # 6.2.1 Ensure password fields are not empty
 if [ $(awk -F: '($2 == "" ) { print $1 " does not have a password " }'  /etc/shadow | wc -l) -eq 0 ]; then
     echo -e "Password fields are not empty: \033[1;32mOK\033[0m"
@@ -319,4 +317,4 @@ echo -e "Some users have .rhosts files: \033[1;31mERROR\033[0m" >> audit-error.l
 fi
 
 
-
+printf "Finished auditing with score: $COUNTER/9 \n"
