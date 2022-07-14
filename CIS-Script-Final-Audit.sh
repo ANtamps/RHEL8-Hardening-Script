@@ -628,26 +628,26 @@ wireless | xargs -0 dirname); do basename "$(readlink -f
 
 ##3.2
 if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.ip_forward = 0" &> /dev/null; then
-    echo "IPv4 forwarding is disabled: \033[1;32mOK\033[0m"
+    echo -e "IPv4 forwarding is disabled: \033[1;32mOK\033[0m"
     let COUNTER++
     if sysctl net.ipv4.ip_forward | grep "net.ipv4.ip_forward = 0" &> /dev/null; then
-        echo "Kernel parameter for ip forwarding set to 0: \033[1;32mOK\033[0m"
+        echo -e "Kernel parameter for ip forwarding set to 0: \033[1;32mOK\033[0m"
          let COUNTER++
 	else
-        echo "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
+        echo -e "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m"
+        echo -e "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 
      if sysctl net.ipv4.route.flush | grep "net.ipv4.route.flush = 1" &> /dev/null; then
-        echo "Kernel parameter for route flush set to 1: \033[1;32mOK\033[0m"
+        echo -e "Kernel parameter for route flush set to 1: \033[1;32mOK\033[0m"
 	 let COUNTER++
     else
-        echo "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m" >> audit-error.log
+        echo -e "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m"
+        echo -e "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 else
-    echo "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m"
-    echo "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m" >> audit-error.log
+    echo -e "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m"
+    echo -e "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -673,31 +673,32 @@ fi
 # fi
 
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
-    echo "Packet redirecting all set to 0: \033[1;32mOK\033[0m"
+    echo -e "Packet redirecting all set to 0: \033[1;32mOK\033[0m"
     let COUNTER++
     if sysctl net.ipv4.conf.all.send_redirects | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
         echo "Packet redirecting all set to 0 in kernel parameters: \033[1;32mOK\033[0m"
  	let COUNTER++    	
     else
-        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"  >> audit-error.log
-else
-    echo "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m"
-    echo "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
-
-if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
-    echo "Packet redirecting default set to 0: \033[1;32mOK\033[0m"
-     let COUNTER++
-    if sysctl net.ipv4.conf.default.send_redirects | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
-        echo "Packet redirecting default set to 0 in kernel parameters: \033[1;32mOK\033[0m"
-    	 let COUNTER++
-	else
-        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m" >> audit-error.log
+        echo -e "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
+        echo -e "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"  >> audit-error.log
     fi
 else
-    echo "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" 
-    echo "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
+    echo -e "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m"
+    echo -e "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
+
+if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
+    echo -e "Packet redirecting default set to 0: \033[1;32mOK\033[0m"
+     let COUNTER++
+    if sysctl net.ipv4.conf.default.send_redirects | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
+        echo -e "Packet redirecting default set to 0 in kernel parameters: \033[1;32mOK\033[0m"
+    	 let COUNTER++
+	else
+        echo -e "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
+        echo -e "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m" >> audit-error.log
+    fi
+else
+    echo -e "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" 
+    echo -e "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
