@@ -47,8 +47,6 @@ do
 done
 		
 
-
-
 ##1.2.3 Ensure gpgcheck is globally activated (Automated)##
 sed -i 's/^gpgcheck\s*=\s*.*/gpgcheck=1/' /etc/dnf/dnf.conf
 
@@ -1253,7 +1251,7 @@ touch /etc/audit/rules.d/50-time-change.rules
  printf "
 -a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k timechange
 -a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k timechange
--w /etc/localtime -p wa -k time-change
+-w /etc/localtime -p wa -k timechange
 " >> /etc/audit/rules.d/50-time-change.rules
 
 ##4.1.3.5 Ensure events that modify the system's network environment are collected

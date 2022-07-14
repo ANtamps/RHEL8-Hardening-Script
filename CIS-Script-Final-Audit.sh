@@ -6,6 +6,52 @@
 let COUNTER=0
 touch audit-error.log
 
+cat << "EOF"
+=====================================================================
+  _____       _                     _____           _       _   
+ |_   _|     | |                   / ____|         (_)     | |  
+   | |  _ __ | |_ ___ _ __ _ __   | (___   ___ _ __ _ _ __ | |_ 
+   | | | '_ \| __/ _ \ '__| '_ \   \___ \ / __| '__| | '_ \| __|
+  _| |_| | | | ||  __/ |  | | | |  ____) | (__| |  | | |_) | |_ 
+ |_____|_| |_|\__\___|_|  |_| |_| |_____/ \___|_|  |_| .__/ \__|
+                                                     | |        
+                                                     |_|  
+	         
+		By: Benlot,  Tampoy, and Vero										
+=====================================================================													 
+EOF
+
+echo -e "Pick out your preferred firewall from the list below: \n"
+
+PS3="Enter your preferred firewall: "
+options=("firewalld" "nftables" "iptables" "quit")
+
+select opt in "${options[@]}"
+do
+	case $opt in
+		"firewalld")
+			echo -e "\nRunning script with firewalld..."
+			firewall_value=1
+			break
+			;;
+		"nftables")
+			echo -e "\nRunning script with nftables..."
+			firewall_value=2
+			break
+			;;
+		"iptables")
+			echo -e "\nRunning script with iptables..."
+			firewall_value=3
+			break
+			;;
+		"quit")
+			echo -e "\nQuitting program..."
+			exit
+			;;
+		*) echo "Invalid option $REPLY";;
+	esac 
+done
+
 ##1.2.3 Ensure gpgcheck is globally activated (Automated)##
 if grep ^gpgcheck /etc/dnf/dnf.conf &> /dev/null; then
 	echo -e "gpgcheck=1: \033[1;32mOK\033[0m"
@@ -651,8 +697,6 @@ else
 
 fi
 
-echo "test"
-
 # If IPv6 is enabled, uncomment this
 
 # if cat /etc/sysctl.d/60-netipv6_sysctl.conf | grep "net.ipv6.conf.all.forwarding = 0" &> /dev/null; then
@@ -672,8 +716,6 @@ echo "test"
 # else
 #     echo "IPv6 forwarding might be enabled: \033[1;31mERROR\033[0m"
 # fi
-
-echo "test2"
 
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
     echo -e "Packet redirecting all set to 0: \033[1;32mOK\033[0m"
@@ -705,7 +747,6 @@ else
 
 fi
 
-echo "test3"
 ##3.3##
 ##3.3.1 Ensure source routed packets are not accepted (Automated)##
 if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
@@ -866,209 +907,210 @@ fi
 
 ##3.4.1
 
-##3.4.1.1 Ensure firewalld is installed
-if rpm -q firewalld iptables &> /dev/null; then
-    echo -e "firewalld and iptables installed: \033[1;32mOK\033[0m"
-     let COUNTER++
-else
-     echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m"   
-     echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m" >> audit-error.log
+if [ $firewall_value -eq 1 ]; then
+    ##3.4.1.1 Ensure firewalld is installed
+    if rpm -q firewalld iptables &> /dev/null; then
+        echo -e "firewalld and iptables installed: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else
+        echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m"   
+        echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
+    fi
+    ##3.4.1.2 Ensure iptables-services not installed with firewalld
+    if rpm -q iptables-services &> /dev/null; then
+        echo -e "package iptables-services found: \033[1;31mERROR\033[0m"
+        echo -e "package iptables-services found: \033[1;31mERROR\033[0m" >> audit-error.log
+        let COUNTER++
+    else   
+    echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"
+
+    fi
+
+    ##3.4.1.3 Ensure nftables either not installed or masked with firewalld 
+    if  rpm -q nftables &> /dev/null; then
+        echo -e "package nftables not installed: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "package nftables found: \033[1;31mERROR\033[0m"
+        echo -e "package nftables found: \033[1;31mERROR\033[0m" >> audit-error.log
+
+    fi
+
+    ##3.4.1.4 Ensure firewalld service enabled and running
+    if  systemctl is-enabled firewalld &> /dev/null; then
+        echo -e "Enabled: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "Not enabled: \033[1;31mERROR\033[0m"
+        echo -e "Not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
+
+    fi
+
+    if  firewall-cmd --state &> /dev/null; then
+        echo -e "Running: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "Not running: \033[1;31mERROR\033[0m"
+        echo -e "Not running: \033[1;31mERROR\033[0m" >> audit-error.log
+
+    fi
+
+    ##3.4.1.5 Ensure firewalld default zone is set 
+
+    if   firewall-cmd --get-default-zone &> /dev/null; then
+        echo -e "Zone is set: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "No zone found: \033[1;31mERROR\033[0m"
+        echo -e "No zone found: \033[1;31mERROR\033[0m" >> audit-error.log
+
+    fi
 fi
-##3.4.1.2 Ensure iptables-services not installed with firewalld
-if rpm -q iptables-services &> /dev/null; then
-    echo -e "package iptables-services found: \033[1;31mERROR\033[0m"
-     let COUNTER++
-else   
-   echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"
-  echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> audit-error.log
-
-fi
-
-##3.4.1.3 Ensure nftables either not installed or masked with firewalld 
-if  rpm -q nftables &> /dev/null; then
-     echo -e "package nftables not installed: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "package nftables found: \033[1;31mERROR\033[0m"
-     echo -e "package nftables found: \033[1;31mERROR\033[0m" >> audit-error.log
-
-fi
-
-##3.4.1.4 Ensure firewalld service enabled and running
-if  systemctl is-enabled firewalld &> /dev/null; then
-    echo -e "Enabled: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-    echo -e "Not enabled: \033[1;31mERROR\033[0m"
-    echo -e "Not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
-
-fi
-
-if  firewall-cmd --state &> /dev/null; then
-    echo -e "Running: \033[1;32mOK\033[0m"
-    let COUNTER++
-else   
-    echo -e "Not running: \033[1;31mERROR\033[0m"
-    echo -e "Not running: \033[1;31mERROR\033[0m" >> audit-error.log
-
-fi
-
-##3.4.1.5 Ensure firewalld default zone is set 
-
-if   firewall-cmd --get-default-zone &> /dev/null; then
-    echo -e "Zone is set: \033[1;32mOK\033[0m"
-    let COUNTER++
-else   
-    echo -e "No zone found: \033[1;31mERROR\033[0m"
-    echo -e "No zone found: \033[1;31mERROR\033[0m" >> audit-error.log
-
-fi
-
 ##3.4.2
 
+if [ $firewall_value -eq 2 ]; then
 ##3.4.2.1 Ensure nftables is installed (Automated)
 
-if  rpm -q nftables &> /dev/null; then
-    echo -e "nftables installed: \033[1;32mOK\033[0m"
+    if  rpm -q nftables &> /dev/null; then
+        echo -e "nftables installed: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "nftable not found: \033[1;31mERROR\033[0m"
+        echo -e "nftable not found: \033[1;31mERROR\033[0m" >> audit-error.log
+
+    fi
+    ##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
+    if   systemctl is-enabled firewalld &> /dev/null; then
+        echo -e "firewalld unmasked: \033[1;31mERROR\033[0m"
+        let COUNTER++
+    else   
+    echo -e "firewalld nmasked: \033[1;32mOK\033[0m"
+    echo -e "firewalld nmasked: \033[1;32mOK\033[0m" >> audit-error.log
+    fi
+    ##3.4.2.3 Ensure iptables-services not installed with nftables
+    if  rpm -q iptables-services &> /dev/null; then
+        echo -e "package iptables-services found: \033[1;31mERROR\033[0m"
+        let COUNTER++
+    else
+        echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"    
+        echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> audit-error.log
+    fi
+
+    ##3.4.2.4 Ensure iptables are flushed with nftables (Manual)
+
+    ##3.4.2.5 Ensure an nftables table exists
+    nft list tables
+    echo -e  "nftables table exists: \033[1;32mOK\033[0m"
     let COUNTER++
-else   
-     echo -e "nftable not found: \033[1;31mERROR\033[0m"
-     echo -e "nftable not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
-fi
-##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
-if   systemctl is-enabled firewalld &> /dev/null; then
-    echo -e "firewalld unmasked: \033[1;31mERROR\033[0m"
-     let COUNTER++
-else   
-   echo -e "firewalld nmasked: \033[1;32mOK\033[0m"
-   echo -e "firewalld nmasked: \033[1;32mOK\033[0m" >> audit-error.log
-fi
-##3.4.2.3 Ensure iptables-services not installed with nftables
-if  rpm -q iptables-services &> /dev/null; then
-     echo -e "package iptables-services found: \033[1;31mERROR\033[0m"
-     let COUNTER++
-else
-     echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"    
-     echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> audit-error.log
+    ##3.4.2.6 Ensure nftables base chains exist
 
-fi
+    if   nft list ruleset | grep 'hook input' &> /dev/null; then
+        echo -e "type filter hook input priority 0: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m"
+        echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
-##3.4.2.4 Ensure iptables are flushed with nftables (Manual)
+    fi
 
-##3.4.2.5 Ensure an nftables table exists
- nft list tables
-echo -e  "nftables table exists: \033[1;32mOK\033[0m"
- let COUNTER++
+    if    nft list ruleset | grep 'hook forward' &> /dev/null; then
+        echo -e "type filter hook forward priority 0: \033[1;32mOK\033[0m"  
+        let COUNTER++
+    else   
+        echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m"
+        echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
-##3.4.2.6 Ensure nftables base chains exist
+    fi
 
-if   nft list ruleset | grep 'hook input' &> /dev/null; then
-     echo -e "type filter hook input priority 0: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m"
-     echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
+    if     nft list ruleset | grep 'hook output' &> /dev/null; then
+        echo -e "type filter hook output priority 0: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m"
+        echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
+    fi
 
-fi
+    ##3.4.2.7 Ensure nftables loopback traffic is configured
 
-if    nft list ruleset | grep 'hook forward' &> /dev/null; then
-     echo -e "type filter hook forward priority 0: \033[1;32mOK\033[0m"  
-     let COUNTER++
-else   
-     echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m"
-     echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
+    if     nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /dev/null; then
+        echo -e "loopback interface configured: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "loopback interface configured: \033[1;31mERROR\033[0m"
+        echo -e "loopback interface configured: \033[1;31mERROR\033[0m" >> audit-error.log
 
-fi
+    fi
 
-if     nft list ruleset | grep 'hook output' &> /dev/null; then
-     echo -e "type filter hook output priority 0: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m"
-     echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
-fi
+    ##3.4.2.8 Ensure nftables outbound and established connections are configured (Manual)
 
+    ##3.4.2.9 Ensure nftables default deny firewall policy (Automated)
 
-##3.4.2.7 Ensure nftables loopback traffic is configured
+    if     nft list ruleset | grep 'hook input' &> /dev/null; then
+        echo -e "type filter hook input priority 0; policy drop configured: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$"
+        echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$" >> audit-error.log
 
-if     nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /dev/null; then
-     echo -e "loopback interface configured: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "loopback interface configured: \033[1;31mERROR\033[0m"
-     echo -e "loopback interface configured: \033[1;31mERROR\033[0m" >> audit-error.log
+    fi
 
-fi
+    if     nft list ruleset | grep 'hook forward' &> /dev/null; then
+        echo -e "type filter hook forward priority 0; policy drop configured: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$"
+        echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$" >> audit-error.log
 
+    fi
 
+    if     nft list ruleset | grep 'hook output' &> /dev/null; then
+        echo -e "type filter hook output priority 0; policy drop configured: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$"
+        echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$" >> audit-error.log
+    fi
 
-##3.4.2.8 Ensure nftables outbound and established connections are configured (Manual)
+    ##3.4.2.10 Ensure nftables service is enabled## 
+    if     systemctl is-enabled nftables &> /dev/null; then
+        echo -e "nftables services enabled: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "nftables services not enabled: \033[1;31mERROR\033[0m"
+        echo -e "nftables services not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
-##3.4.2.9 Ensure nftables default deny firewall policy (Automated)
-
-if     nft list ruleset | grep 'hook input' &> /dev/null; then
-     echo -e "type filter hook input priority 0; policy drop configured: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$"
-     echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$" >> audit-error.log
-
+    fi
 fi
 
-if     nft list ruleset | grep 'hook forward' &> /dev/null; then
-     echo -e "type filter hook forward priority 0; policy drop configured: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$"
-     echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$" >> audit-error.log
+if [ $firewall_value -eq 3 ]; then
+    if rpm -q iptables ip tables-services &> /dev/null; then
+        echo -e "iptables installed: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else   
+        echo -e "ip tables not found: \033[1;31mERROR\033[0m"
+        echo -e "ip tables not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
-fi
+    fi
 
-if     nft list ruleset | grep 'hook output' &> /dev/null; then
-     echo -e "type filter hook output priority 0; policy drop configured: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$"
-     echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$" >> audit-error.log
-fi
+    if rpm -q nftables &> /dev/null; then
+        echo -e "nftables installed: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else
+        echo -e "nftables not installed: \033[1;31mERROR\033[0m"
+        echo -e "nftables not installed: \033[1;31mERROR\033[0m" >> audit-error.log
 
-##3.4.2.10 Ensure nftables service is enabled## 
-if     systemctl is-enabled nftables &> /dev/null; then
-     echo -e "nftables services enabled: \033[1;32mOK\033[0m"
-     let COUNTER++
-else   
-     echo -e "nftables services not enabled: \033[1;31mERROR\033[0m"
-     echo -e "nftables services not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
+    fi
 
-fi
+    if rpm -q firewalld &> /dev/null; then
+        echo -e "firewalld installed: \033[1;32mOK\033[0m"
+        let COUNTER++
+    else
+        echo -e "firewalld not installed: \033[1;31mERROR\033[0m"
+        echo -e "firewalld not installed: \033[1;31mERROR\033[0m" >> audit-error.log
 
-if rpm -q iptables ip tables-services &> /dev/null; then
-    echo -e "iptables installed: \033[1;32mOK\033[0m"
-    let COUNTER++
-else   
-    echo -e "ip tables not found: \033[1;31mERROR\033[0m"
-    echo -e "ip tables not found: \033[1;31mERROR\033[0m" >> audit-error.log
-
-fi
-
-if rpm -q nftables &> /dev/null; then
-    echo -e "nftables installed: \033[1;32mOK\033[0m"
-    let COUNTER++
-else
-    echo -e "nftables not installed: \033[1;31mERROR\033[0m"
-    echo -e "nftables not installed: \033[1;31mERROR\033[0m" >> audit-error.log
-
-fi
-
-if rpm -q firewalld &> /dev/null; then
-    echo -e "firewalld installed: \033[1;32mOK\033[0m"
-     let COUNTER++
-else
-    echo -e "firewalld not installed: \033[1;31mERROR\033[0m"
-     echo -e "firewalld not installed: \033[1;31mERROR\033[0m" >> audit-error.log
-
+    fi
 fi
 
 ##4.1.1.1 Ensure auditd is installed
