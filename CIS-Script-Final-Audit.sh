@@ -684,7 +684,7 @@ if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.ip_forward = 0" &> 
         echo -e "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 
-     if sysctl net.ipv4.route.flush | grep "net.ipv4.route.flush = 1" &> /dev/null; then
+     if sysctl -w net.ipv4.route.flush=1 | grep "net.ipv4.route.flush = 1" &> /dev/null; then
         echo -e "Kernel parameter for route flush set to 1: \033[1;32mOK\033[0m"
 	 let COUNTER++
     else
@@ -721,7 +721,7 @@ if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.conf.all.send_redir
     echo -e "Packet redirecting all set to 0: \033[1;32mOK\033[0m"
     let COUNTER++
     if sysctl net.ipv4.conf.all.send_redirects | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
-        echo "Packet redirecting all set to 0 in kernel parameters: \033[1;32mOK\033[0m"
+        echo -e "Packet redirecting all set to 0 in kernel parameters: \033[1;32mOK\033[0m"
  	let COUNTER++    	
     else
         echo -e "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
