@@ -1,9 +1,5 @@
 #!/bin/bash
 
-COUNTER=0
-
-echo "Creating audit logs error file..."
-touch chapter3-audit-error.log
 
 ##3.1
 if modprobe -n -v sctp &> /dev/null; then
@@ -11,7 +7,7 @@ if modprobe -n -v sctp &> /dev/null; then
 	 let COUNTER++
 else
 	echo -e "SCTP is not disabled: \033[1;31mERROR\033[0m"
-	echo -e "SCTP is not disabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+	echo -e "SCTP is not disabled: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 lsmod | grep sctp
 
@@ -20,7 +16,7 @@ if modprobe -n -v dccp &> /dev/null; then
 	let COUNTER++	
 else
 	echo -e "DCCP is not disabled: \033[1;31mERROR\033[0m"
-        echo -e "DCCP is not disabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+        echo -e "DCCP is not disabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 lsmod | grep sctp
@@ -61,7 +57,7 @@ if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.ip_forward = 0" &> 
          let COUNTER++
 	else
         echo "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+        echo "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 
      if sysctl net.ipv4.route.flush | grep "net.ipv4.route.flush = 1" &> /dev/null; then
@@ -69,11 +65,11 @@ if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.ip_forward = 0" &> 
 	 let COUNTER++
     else
         echo "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+        echo "Kernel parameter for route flush not set to 1: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 else
     echo "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m"
-    echo "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+    echo "IPv4 forwarding might be enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -106,12 +102,10 @@ if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redire
  	let COUNTER++    	
     else
         echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"  >> chapter3-audit-error.log
-    fi
+        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"  >> audit-error.log
 else
     echo "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m"
-    echo "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
-fi
+    echo "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
 
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
     echo "Packet redirecting default set to 0: \033[1;32mOK\033[0m"
@@ -121,11 +115,11 @@ if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_re
     	 let COUNTER++
 	else
         echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
-        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+        echo "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 else
     echo "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" 
-    echo "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log 
+    echo "Default redirect might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -139,10 +133,12 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 echo -e "Source routed packets are not accepted: \033[1;32mOK\033[0m"
 		 let COUNTER++
 	else
-		echo -e "Source routed packets are accepted: \033[1;31mERROR\033[0m"
+		echo -e "Source routed packets are accepted: \033[1;31mERROR\033[0m" 
+          echo -e "Source routed packets are accepted: \033[1;31mERROR\033[0m" >> audit-error.log
 	fi
 else
 echo -e "Source routed packets are accepted: \033[1;31mERROR\033[0m"
+echo -e "Source routed packets are accepted: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##3.3.2 Ensure ICMP redirects are not accepted (Automated)##
@@ -155,12 +151,12 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		 echo -e "ICMP redirects are accepted: \033[1;31mERROR\033[0m"
-                 echo -e "ICMP redirects are accepted: \033[1;31mERROR\033[0m"  >> chapter3-audit-error.log 
+                 echo -e "ICMP redirects are accepted: \033[1;31mERROR\033[0m"  >> audit-error.log
 
 	 fi
 else
 echo -e "ICMP redirects are accepted: \033[1;31mERROR\033[0m"
-echo -e "ICMP redirects are accepted: \033[1;31mERROR\033[0m"  >> chapter3-audit-error.log 
+echo -e "ICMP redirects are accepted: \033[1;31mERROR\033[0m"  >> audit-error.log
 
 fi
 
@@ -174,11 +170,11 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		echo -e "Secure ICMP redirects are accepted: \033[1;31mERROR\033[0m"
- 		echo -e "Secure ICMP redirects are accepted: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+ 		echo -e "Secure ICMP redirects are accepted: \033[1;31mERROR\033[0m" >> audit-error.log
 	 fi
 else
 echo -e "Secure ICMP redirects are accepted: \033[1;31mERROR\033[0m"
-echo -e "Secure ICMP redirects are accepted: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "Secure ICMP redirects are accepted: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##3.3.4 Ensure suspicious packets are logged (Automated)##
@@ -191,12 +187,12 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		 echo -e "Suspicious packets are not logged: \033[1;31mERROR\033[0m"
-                 echo -e "Suspicious packets are not logged: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+                 echo -e "Suspicious packets are not logged: \033[1;31mERROR\033[0m" >> audit-error.log
 
 	 fi
 else
 echo -e "Suspicious packets are not logged: \033[1;31mERROR\033[0m" 
-echo -e "Suspicious packets are not logged: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "Suspicious packets are not logged: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -209,11 +205,11 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		 echo -e "Broadcast ICMP requests are not ignored: \033[1;31mERROR\033[0m"
- 		echo -e "Broadcast ICMP requests are not ignored: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+ 		echo -e "Broadcast ICMP requests are not ignored: \033[1;31mERROR\033[0m" >> audit-error.log
 	 fi
 else
 echo -e "Broadcast ICMP requests are not ignored: \033[1;31mERROR\033[0m"
-echo -e "Broadcast ICMP requests are not ignored: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "Broadcast ICMP requests are not ignored: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##3.3.6 Ensure bogus ICMP responses are ignored (Automated)##
@@ -225,11 +221,11 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		 echo -e "Bogus ICMP responses are not ignored: \033[1;31mERROR\033[0m"
-		echo -e "Bogus ICMP responses are not ignored: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+		echo -e "Bogus ICMP responses are not ignored: \033[1;31mERROR\033[0m" >> audit-error.log
 	 fi
 else
 echo -e "Bogus ICMP responses are not ignored: \033[1;31mERROR\033[0m" 
-echo -e "Bogus ICMP responses are not ignored: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "Bogus ICMP responses are not ignored: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##3.3.7 Ensure Reverse Path Filtering is enabled (Automated)##
@@ -242,11 +238,10 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		 echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m"
-		echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
-	 fi
+		echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 else
 echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m"
-echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "Reverse Path Filtering is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 ##3.3.8 Ensure TCP SYN Cookies is enabled (Automated)##
@@ -258,12 +253,12 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		echo -e "TCP SYN Cookies is not enabled: \033[1;31mERROR\033[0m"
-		 echo -e "TCP SYN Cookies is not enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+		 echo -e "TCP SYN Cookies is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
 	 fi
 else
 echo -e "TCP SYN Cookies is not enabled: \033[1;31mERROR\033[0m"
-echo -e "TCP SYN Cookies is not enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "TCP SYN Cookies is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 
@@ -277,11 +272,11 @@ if test -f /etc/sysctl.d/60-netipv4_sysctl.conf; then
 		 let COUNTER++
 	else
 		echo -e "IPv6 router advertisements are not accepted: \033[1;31mERROR\033[0m" 
-		 echo -e "IPv6 router advertisements are not accepted: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+		 echo -e "IPv6 router advertisements are not accepted: \033[1;31mERROR\033[0m" >> audit-error.log
 	 fi
 else
 echo -e "IPv6 router advertisements are not accepted: \033[1;31mERROR\033[0m" 
-echo -e "IPv6 router advertisements are not accepted: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+echo -e "IPv6 router advertisements are not accepted: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -293,7 +288,7 @@ if rpm -q firewalld iptables &> /dev/null; then
      let COUNTER++
 else
      echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m"   
-     echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "firewalld and iptables not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 ##3.4.1.2 Ensure iptables-services not installed with firewalld
@@ -302,7 +297,7 @@ if rpm -q iptables-services &> /dev/null; then
      let COUNTER++
 else   
    echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"
-  echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> chapter3-audit-error.log
+  echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> audit-error.log
 
 fi
 
@@ -312,7 +307,7 @@ if  rpm -q nftables &> /dev/null; then
      let COUNTER++
 else   
      echo -e "package nftables found: \033[1;31mERROR\033[0m"
-     echo -e "package nftables found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log 
+     echo -e "package nftables found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -322,7 +317,7 @@ if  systemctl is-enabled firewalld &> /dev/null; then
      let COUNTER++
 else   
     echo -e "Not enabled: \033[1;31mERROR\033[0m"
-    echo -e "Not enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+    echo -e "Not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -331,7 +326,7 @@ if  firewall-cmd --state &> /dev/null; then
     let COUNTER++
 else   
     echo -e "Not running: \033[1;31mERROR\033[0m"
-    echo -e "Not running: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+    echo -e "Not running: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -342,7 +337,7 @@ if   firewall-cmd --get-default-zone &> /dev/null; then
     let COUNTER++
 else   
     echo -e "No zone found: \033[1;31mERROR\033[0m"
-    echo -e "No zone found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+    echo -e "No zone found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -355,7 +350,7 @@ if  rpm -q nftables &> /dev/null; then
     let COUNTER++
 else   
      echo -e "nftable not found: \033[1;31mERROR\033[0m"
-     echo -e "nftable not found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "nftable not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 ##3.4.2.2 Ensure firewalld is either not installed or masked with nftables 
@@ -364,7 +359,7 @@ if   systemctl is-enabled firewalld &> /dev/null; then
      let COUNTER++
 else   
    echo -e "firewalld nmasked: \033[1;32mOK\033[0m"
-   echo -e "firewalld nmasked: \033[1;32mOK\033[0m" >> chapter3-audit-error.log
+   echo -e "firewalld nmasked: \033[1;32mOK\033[0m" >> audit-error.log
 fi
 ##3.4.2.3 Ensure iptables-services not installed with nftables
 if  rpm -q iptables-services &> /dev/null; then
@@ -372,7 +367,7 @@ if  rpm -q iptables-services &> /dev/null; then
      let COUNTER++
 else
      echo -e "package iptables-services not installed: \033[1;32mOK\033[0m"    
-     echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> chapter3-audit-error.log
+     echo -e "package iptables-services not installed: \033[1;32mOK\033[0m" >> audit-error.log
 
 fi
 
@@ -390,7 +385,7 @@ if   nft list ruleset | grep 'hook input' &> /dev/null; then
      let COUNTER++
 else   
      echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m"
-     echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "type filter hook input priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -399,7 +394,7 @@ if    nft list ruleset | grep 'hook forward' &> /dev/null; then
      let COUNTER++
 else   
      echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m"
-     echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "type filter hook forward priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -408,7 +403,7 @@ if     nft list ruleset | grep 'hook output' &> /dev/null; then
      let COUNTER++
 else   
      echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m"
-     echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "type filter hook output priority 0 not found: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
 
@@ -419,7 +414,7 @@ if     nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept' &> /de
      let COUNTER++
 else   
      echo -e "loopback interface configured: \033[1;31mERROR\033[0m"
-     echo -e "loopback interface configured: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "loopback interface configured: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -434,7 +429,7 @@ if     nft list ruleset | grep 'hook input' &> /dev/null; then
      let COUNTER++
 else   
      echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$"
-     echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$" >> chapter3-audit-error.log
+     echo -e "type filter hook input priority 0; policy drop not configured: \033[1;31mERROR\03$" >> audit-error.log
 
 fi
 
@@ -443,7 +438,7 @@ if     nft list ruleset | grep 'hook forward' &> /dev/null; then
      let COUNTER++
 else   
      echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$"
-     echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$" >> chapter3-audit-error.log
+     echo -e "type filter hook forward priority 0; policy drop not configured: \033[1;31mERROR\$" >> audit-error.log
 
 fi
 
@@ -452,7 +447,7 @@ if     nft list ruleset | grep 'hook output' &> /dev/null; then
      let COUNTER++
 else   
      echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$"
-     echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$" >> chapter3-audit-error.log
+     echo -e "type filter hook output priority 0; policy drop not configured: \033[1;31mERROR\0$" >> audit-error.log
 fi
 
 ##3.4.2.10 Ensure nftables service is enabled## 
@@ -461,7 +456,7 @@ if     systemctl is-enabled nftables &> /dev/null; then
      let COUNTER++
 else   
      echo -e "nftables services not enabled: \033[1;31mERROR\033[0m"
-     echo -e "nftables services not enabled: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "nftables services not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -470,7 +465,7 @@ if rpm -q iptables ip tables-services &> /dev/null; then
     let COUNTER++
 else   
     echo -e "ip tables not found: \033[1;31mERROR\033[0m"
-    echo -e "ip tables not found: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+    echo -e "ip tables not found: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -479,7 +474,7 @@ if rpm -q nftables &> /dev/null; then
     let COUNTER++
 else
     echo -e "nftables not installed: \033[1;31mERROR\033[0m"
-    echo -e "nftables not installed: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+    echo -e "nftables not installed: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
@@ -488,8 +483,8 @@ if rpm -q firewalld &> /dev/null; then
      let COUNTER++
 else
     echo -e "firewalld not installed: \033[1;31mERROR\033[0m"
-     echo -e "firewalld not installed: \033[1;31mERROR\033[0m" >> chapter3-audit-error.log
+     echo -e "firewalld not installed: \033[1;31mERROR\033[0m" >> audit-error.log
 
 fi
 
-printf "Finished auditing with score: $COUNTER/39 \n"
+printf "Finished auditing with score: $COUNTER/41 \n"

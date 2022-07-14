@@ -56,13 +56,4 @@ chmod 0000 /etc/gshadow-
 stat /etc/gshadow-
 echo "Permissions on /etc/gshadow- configured, continuing.."
 
-##6.1.11 Ensure no world writable files exist
-
-##6.1.12 Ensure no unowned files or directories exist
-
-##6.1.13 Ensure no ungrouped files or directories exist
-
-##6.1.14 Audit SUID executables (Manual)
-
-##6.1.15 Audit SGID executables (Manual)
 
