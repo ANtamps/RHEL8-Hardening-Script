@@ -11,15 +11,11 @@ cat << "EOF"
                                                      | |        
                                                      |_|  
 	         
-			 By: Benlot,  Tampoy, and Vero										
+		By: Benlot,  Tampoy, and Vero										
 =====================================================================													 
 EOF
 
-echo -e "Welcome to the Intern Script, check out the menu\n"
-echo "(1) Run the script using firewalld"
-echo "(2) Run the script using nftables"
-echo "(3) Run the script using iptables"
-echo "(4) Quit the program"
+echo -e "Pick out your preferred firewall from the list below: \n"
 
 PS3="Enter your preferred firewall: "
 options=("firewalld" "nftables" "iptables" "quit")
@@ -64,7 +60,7 @@ if  rpm -qa | grep -q "aide"; then
 	echo "AIDE already installed"
 else
 	echo "AIDE not installed, installing.."
-	dnf install aide
+	dnf -y install aide
 fi
 
 ##To initialize AIDE##
