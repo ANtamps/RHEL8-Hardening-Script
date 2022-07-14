@@ -164,6 +164,7 @@ group_name_counter=0
 cut -d: -f1 /etc/group | sort | uniq -d | while read -r x; do 
     echo -e "Duplicate group name ${x} in /etc/group: \033[1;31mERROR\033[0m"
     echo -e "Duplicate group name ${x} in /etc/group: \033[1;31mERROR\033[0m" >> audit-error.log
+    let group_name_counter++
 done
 
 if [ $group_name_counter -eq 0 ]; then
@@ -317,4 +318,4 @@ echo -e "Some users have .rhosts files: \033[1;31mERROR\033[0m" >> audit-error.l
 fi
 
 
-printf "Finished auditing with score: $COUNTER/9 \n"
+printf "Finished auditing with score: $COUNTER/20 \n"
