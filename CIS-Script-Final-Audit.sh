@@ -684,7 +684,7 @@ if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.ip_forward = 0" &> 
         echo -e "Kernel parameter for ip forwarding not set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
     fi
 
-     if sysctl net.ipv4.route.flush | grep "net.ipv4.route.flush = 1" &> /dev/null; then
+     if sysctl -w net.ipv4.route.flush=1 | grep "net.ipv4.route.flush = 1" &> /dev/null; then
         echo -e "Kernel parameter for route flush set to 1: \033[1;32mOK\033[0m"
 	 let COUNTER++
     else
@@ -717,11 +717,11 @@ fi
 #     echo "IPv6 forwarding might be enabled: \033[1;31mERROR\033[0m"
 # fi
 
-if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
+if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
     echo -e "Packet redirecting all set to 0: \033[1;32mOK\033[0m"
     let COUNTER++
     if sysctl net.ipv4.conf.all.send_redirects | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
-        echo "Packet redirecting all set to 0 in kernel parameters: \033[1;32mOK\033[0m"
+        echo -e "Packet redirecting all set to 0 in kernel parameters: \033[1;32mOK\033[0m"
  	let COUNTER++    	
     else
         echo -e "Kernel parameter not set for packet redirecting: \033[1;31mERROR\033[0m"
@@ -731,7 +731,7 @@ else
     echo -e "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m"
     echo -e "Packet redirecting might not be set to 0: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
-if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
+if cat /etc/sysctl.d/60-netipv4_sysctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
     echo -e "Packet redirecting default set to 0: \033[1;32mOK\033[0m"
      let COUNTER++
     if sysctl net.ipv4.conf.default.send_redirects | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
@@ -1527,8 +1527,8 @@ if systemctl is-enabled rsyslog &> /dev/null; then
 	echo -e "rsyslog service is enabled: \033[1;32mOK\033[0m"
     let COUNTER++
 else
-	echo -e "rsyslog service is not enabled: \033[1;31mERROR\033[0m"
-    echo -e "rsyslog service is not enabled: \033[1;31mERROR\033[0m" >> audit-error.log
+    echo -e "rsyslog service is masked: \033[1;32mOK\033[0m"
+    let COUNTER++
 fi
 
 ##4.2.1.4 Ensure rsyslog default file permissions are configured(Automated)##
@@ -2132,11 +2132,11 @@ fi
 
 ##6.1.2 Ensure sticky bit is set on all world-writable directories 
 if  df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null &> /dev/null; then
-    echo -e "Sticky bit is set: \033[1;32mOK\033[0m"
-    let COUNTER++
-else
     echo -e "Sticky bit is not set: \033[1;31mERROR\033[0m"
     echo -e "Sticky bit is not set: \033[1;31mERROR\033[0m" >> audit-error.log
+    let COUNTER++
+else
+    echo -e "Sticky bit is set: \033[1;32mOK\033[0m"
 fi
 
 ##6.1.3 Ensure permissions on /etc/passwd are configured 
