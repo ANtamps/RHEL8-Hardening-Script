@@ -2444,5 +2444,7 @@ echo -e "Some users have .rhosts files: \033[1;31mERROR\033[0m"
 echo -e "Some users have .rhosts files: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
+error_counter=$(cat audit-error.log | wc -l)
+total_counter=$(($COUNTER+$error_counter))
 
-printf "Finished auditing with score: $COUNTER/219 \n"
+printf "Finished auditing with score: $COUNTER/$total_counter \n"
