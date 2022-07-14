@@ -661,12 +661,33 @@ if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.all.send_redire
         echo "Kernel parameter not set for packet redirecting, fixing..."
         sysctl -w net.ipv4.conf.all.send_redirects=0 &> /dev/null
     fi
+
+else
+	echo "Packet redirecting not set to 0, adding it..."
+	echo "net.ipv4.conf.all.send_redirects = 0" >> /etc/sysctl.d/60-netipv4_syctl.conf
+
+	if sysctl net.ipv4.conf.all.send_redirects | grep "net.ipv4.conf.all.send_redirects = 0" &> /dev/null; then
+        echo "Packet redirecting all set to 0 in kernel parameters, continuing..."
+    else
+        echo "Kernel parameter not set for packet redirecting, fixing..."
+        sysctl -w net.ipv4.conf.all.send_redirects=0 &> /dev/null
+    fi
 fi
 
 if cat /etc/sysctl.d/60-netipv4_syctl.conf | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
     echo "Packet redirecting default set to 0, checking in sysctl..."
 
     if sysctl net.ipv4.conf.default.send_redirects | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
+        echo "Packet redirecting default set to 0 in kernel parameters, continuing..."
+    else
+        echo "Kernel parameter not set for packet redirecting, fixing..."
+        sysctl -w net.ipv4.conf.default.send_redirects=0 &> /dev/null
+    fi
+else
+	echo "Packet redirecting default not set to 0, adding it..."
+	echo "net.ipv4.conf.default.send_redirects = 0" >> /etc/sysctl.d/60-netipv4_syctl.conf
+
+	if sysctl net.ipv4.conf.default.send_redirects | grep "net.ipv4.conf.default.send_redirects = 0" &> /dev/null; then
         echo "Packet redirecting default set to 0 in kernel parameters, continuing..."
     else
         echo "Kernel parameter not set for packet redirecting, fixing..."

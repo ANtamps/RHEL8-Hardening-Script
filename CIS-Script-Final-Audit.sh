@@ -1245,7 +1245,7 @@ else
     echo -e "Date and time info modification events not set in disk config: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
-if [ $(auditctl -l | grep -c time-change) -eq 3 ]; then
+if [ $(auditctl -l | grep -c timechange) -eq 3 ]; then
 	echo -e "Date and time info modification events set in running config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
@@ -1387,7 +1387,7 @@ else
     echo -e "File deletion events not set on disk config: \033[1;31mERROR\033[0m" >> audit-error.log
 fi
 
-if [ $(auditctl -l | grep -c delete) -eq 2 ]; then
+if [ $(auditctl -l | grep -c "key=delete") -eq 2 ]; then
     echo  "File deletion events set on running config: \033[1;32mOK\033[0m"
     let COUNTER++
 else
